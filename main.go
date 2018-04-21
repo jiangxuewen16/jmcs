@@ -2,55 +2,39 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"fmt"
 	"flag"
+	"os"
+	"io"
+	"jmcs/core/utilities/net/port"
+	"jmcs/app/routers"
 )
-
-var wsPort  = flag.Int("w", 0, "开启websocket,并监听指定端口（默认8002）")
-var sPort = flag.Int("s", 0, "开启socket,并监听指定端口（默认8001）")
 
 func main() {
 
+
 	socketServcer()		//socket服务
 
-	router := gin.Default()
 
-	router.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "Hello World")
-	})
+	routers.Router.Run(":8000")
 
-	router.GET("/post", func(c *gin.Context) {
-		id := c.Query("id")
-		page := c.DefaultQuery("page", "0")
-		name := c.PostForm("name")
-		message := c.PostForm("message")
-		fmt.Printf("id: %s; page: %s; name: %s; message: %s \n", id, page, name, message)
-		c.JSON(http.StatusOK, gin.H{
-			"status_code": http.StatusOK,
-		})
+}
 
+func logConfig()  {
+	// Disable Console Color, you don't need console color when writing the logs to file.
+	gin.DisableConsoleColor()
 
-	})
-
-	router.GET("/form_post", func(c *gin.Context) {
-		message := c.Query("message")
-		nick := c.DefaultQuery("nick", "anonymous")
-
-		c.JSON(200, gin.H{
-			"status":  "posted",
-			"message": message,
-			"nick":    nick,
-		})
-	})
-	router.Run(":8000")
-
+	// Logging to a file.
+	f, _ := os.Create("gin.log")
+	gin.DefaultWriter = io.MultiWriter(f)
 }
 
 func socketServcer()  {
 	flag.Parse()
-
-	if *wsPort > 0 {
-
+	socketPort := port.Port(*sPort)
+	if socketPort.CheckEnabled(nil) {
+		fmt.Errorf("error:%s已被占用",socketPort)
 	}
+
+
 }
