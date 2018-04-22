@@ -1,10 +1,9 @@
-app:
-  web:
+web:
     enable: true
     port: 8080
-  wbSocket:
+wbSocket:
     enable: true
     port: 8002
-  socket:
+socket:
     enable: true
     port: 8001

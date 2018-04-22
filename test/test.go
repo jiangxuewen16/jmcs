@@ -3,24 +3,19 @@ package main
 import (
 	"os"
 	"io/ioutil"
-	"gopkg.in/yaml.v2"
 	"fmt"
 	"strings"
 	"path/filepath"
 )
 
 func main() {
-	f,err := os.Open("C:/golang/src/jmcs/conf/app.yml")
-	if err != nil {
-		fmt.Println(err)
+	dirList, err := ioutil.ReadDir("C:/golang/src/jmcs/conf/")
+	checkErr(err)
+
+	for _,dir := range dirList {
+		fmt.Println(dir);
 	}
 
-	maps := make(map[interface{}]interface{})
-
-	b,_ := ioutil.ReadAll(f)
-	yaml.Unmarshal(b, &maps)
-	fmt.Println(GetCurrentDirectory())
-	fmt.Println(maps)
 }
 
 func GetCurrentDirectory() string {
