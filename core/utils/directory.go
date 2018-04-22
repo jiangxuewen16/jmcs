@@ -17,11 +17,11 @@ func PathExists(path string) (bool, error) {
 	return false, err
 }
 
-func GetPathAllFileInfo(dir string, suffixs []string) []os.FileInfo {
+func GetPathFileInfo(dir string, suffixs []string) []os.FileInfo {
 	fileList, err := ioutil.ReadDir(dir)
 	CheckErr(err)
 
-	if len(suffix) <= 0 {
+	if len(suffixs) <= 0 {
 		return fileList
 	}
 
@@ -37,8 +37,8 @@ func GetPathAllFileInfo(dir string, suffixs []string) []os.FileInfo {
 	return suffixFiles
 }
 
-func GetPathAllFileName(dir string, suffixs []string) []string {
-	fileInfos := GetPathAllFileInfo(dir, suffixs)
+func GetPathFileName(dir string, suffixs []string) []string {
+	fileInfos := GetPathFileInfo(dir, suffixs)
 	var fileNames = []string{}
 
 	for index, fileInfo := range fileInfos {
@@ -46,4 +46,14 @@ func GetPathAllFileName(dir string, suffixs []string) []string {
 	}
 
 	return fileNames
+}
+
+func GetPathFilePath(dir string, suffixs []string) []string {
+	fileInfos := GetPathFileInfo(dir, suffixs)
+
+	filePaths := []string{}
+	for key,fileInfo := range fileInfos {
+		filePaths[key] = dir + fileInfo.Name()
+	}
+	return filePaths
 }

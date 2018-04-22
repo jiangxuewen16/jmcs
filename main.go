@@ -8,15 +8,12 @@ import (
 	"io"
 	"jmcs/core/utils/net/port"
 	"jmcs/app/routers"
+	"jmcs/core"
 )
 
 func main() {
 
-
-	socketServcer()		//socket服务
-
-
-	routers.Router.Run(":8000")
+	core.Run()
 
 }
 

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	dirList, err := ioutil.ReadDir("C:/golang/src/jmcs/conf/")
+	dirList, err := ioutil.ReadDir("C:/golang/src/jmcs/config/")
 	checkErr(err)
 
 	for _,dir := range dirList {

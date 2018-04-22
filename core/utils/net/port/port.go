@@ -2,6 +2,7 @@ package port
 
 import (
 	"net"
+	"strconv"
 )
 
 type Port int16
@@ -20,8 +21,12 @@ const (
 	MAX = 1 << 16 - 1
 )
 
-func (p Port) getPort() int {
+func (p Port) toInt() int {
 	return int(p)
+}
+
+func (p Port) ToString() string {
+	return strconv.Itoa(p.toInt())
 }
 
 func (p Port) CheckEnabled(ip net.IP) bool {
@@ -32,7 +37,7 @@ func (p Port) CheckEnabled(ip net.IP) bool {
 
 	tcpAddr := net.TCPAddr{
 		IP: ip,
-		Port: p.getPort(),
+		Port: p.toInt(),
 	}
 
 	tcpConn, err := net.DialTCP("tcp", nil, &tcpAddr)

@@ -7,3 +7,4 @@ wbSocket:
 socket:
     enable: true
     port: 8001
+    heartEnable: true
