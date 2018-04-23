@@ -1,0 +1,6 @@
+#slave 客户机    master 主机
+label: master
+
+#server name
+name: "主机一号"
+
