@@ -12,8 +12,6 @@ const (
 	CONFIG_PATH = "C:/golang/src/jmcs/config"
 )
 
-
-
 func init() {
 
 	//初始化所有配置
@@ -28,6 +26,5 @@ func init() {
 }
 
 func Run() {
-	
 	routers.Router.Run(":8000")
 }

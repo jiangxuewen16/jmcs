@@ -2,12 +2,8 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"fmt"
-	"flag"
 	"os"
 	"io"
-	"jmcs/core/utils/net/port"
-	"jmcs/app/routers"
 	"jmcs/core"
 )
 
@@ -24,14 +20,4 @@ func logConfig()  {
 	// Logging to a file.
 	f, _ := os.Create("gin.log")
 	gin.DefaultWriter = io.MultiWriter(f)
-}
-
-func socketServcer()  {
-	flag.Parse()
-	socketPort := port.Port(*sPort)
-	if socketPort.CheckEnabled(nil) {
-		fmt.Errorf("error:%s已被占用",socketPort)
-	}
-
-
 }

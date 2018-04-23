@@ -9,13 +9,13 @@ import (
 	"fmt"
 )
 
-type config struct {
+type socket struct {
 	enable      bool
 	port        port.Port
 	heartEnable bool
 }
 
-var conf config
+var conf socket
 
 const (
 	CONF_NAME = "net.socket"
@@ -26,16 +26,19 @@ func init() {
 	confs := strings.Split(CONF_NAME, ",")
 	baseConfig, ok := utils.Configs[confs[0]][confs[1]]
 	if !ok {
-		conf = config{enable: false}
+		conf = socket{enable: false}
 	}
 
-	conf = config{}
+	conf = socket{}
 	err := mapstructure.Decode(baseConfig, &conf) //解析socket配置
 	utils.CheckErr(err)
 }
 
-func Run() {
+func checkPort(){
 
+}
+
+func Run() {
 	if !conf.enable {
 		return
 	}
@@ -72,8 +75,9 @@ func listenAddr(tcpAddr *net.TCPAddr) *net.TCPListener {
 func handleTcp(conn net.Conn) {
 	for {
 		buf := make([]byte, 512)
-		conn.Read(buf)
 
-		conn.Write()
+		conn.Read(buf)		//todo：读取数据，需要按约定处理
+
+		conn.Write()		//todo：写入返回数据
 	}
 }
