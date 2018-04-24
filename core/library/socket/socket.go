@@ -15,7 +15,7 @@ type socket struct {
 	heartEnable bool
 }
 
-var conf socket
+var Conf socket
 
 const (
 	CONF_NAME = "net.socket"
@@ -26,28 +26,24 @@ func init() {
 	confs := strings.Split(CONF_NAME, ",")
 	baseConfig, ok := utils.Configs[confs[0]][confs[1]]
 	if !ok {
-		conf = socket{enable: false}
+		Conf = socket{enable: false}
 	}
 
-	conf = socket{}
-	err := mapstructure.Decode(baseConfig, &conf) //解析socket配置
+	Conf = socket{}
+	err := mapstructure.Decode(baseConfig, &Conf) //解析socket配置
 	utils.CheckErr(err)
-}
-
-func checkPort(){
-
 }
 
 func Run() {
-	if !conf.enable {
+	if !Conf.enable {
 		return
 	}
 
-	server := ":" + conf.port.ToString()
+	server := ":" + Conf.port.ToString()
 	tcpAddr, err := net.ResolveTCPAddr("tcp", server)
 	utils.CheckErr(err)
 
-	fmt.Println("启动监听tcp:",conf.port)
+	fmt.Println("启动监听tcp:",Conf.port)
 	listen := listenAddr(tcpAddr)
 	fmt.Println("启动完成")
 

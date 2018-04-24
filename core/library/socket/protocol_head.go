@@ -21,61 +21,31 @@ type Sph struct {
 	// accept []common.ContentType `json:"accept"`
 }
 
-
-
-
+/*解析socket约定的数据到结构体*/
 func (h Sph) parse(s string) {
-	 //strs := strings.Split(s, "\r\n\r\n")
-
-	 /*for _,str := range strs {
-
-	 }*/
-}
-
-func p(sph *Sph, s string, value string, i int)  {
-	mutable := reflect.ValueOf(sph).Elem()
-	elem := mutable.FieldByName(s)
-	elem1 := reflect.TypeOf(sph).Elem().Field(i).Tag.Get("json")
-	fmt.Println(elem1)
-	if elem.CanSet() {
-		elem.SetString(value)
-	}
-}
-
-
-
-///////////////////////////////////////////////////////////////
-func main() {
-
-	a := Sph{}
-
-	str := "HEAD / SOCKET/1.0 [没实际意义留着吧]\r\n\r\nRequst-router: /file/send [用于对应后台的路由]\r\n\r\nStatus-code:200\r\n\r\nContent-type: application/json [用于告诉对方body的数据类型,例如文件传输:multipart/file-data]\r\n\r\n" +
-		"Authentication:\r\n\r\nBody: [请求体]"
-
-	strs := strings.Split(str, "\r\n\r\n")
-	for i,st := range strs {
-		if i == 0 {
-			a.Protocol = st
+	 headStrs := strings.Split(s, "\r\n\r\n")
+	for i,headStr := range headStrs {
+		if i == 0 {		//第一行数据是协议
+			h.Protocol = headStr
 			continue
 		}
-		ff := strings.Split(st,":")
-		p(&a, ff[1], i)
+		keyAndValue := strings.Split(headStr,":")
+		(&h).setData(keyAndValue[1], i)
 	}
-	fmt.Println(a)
+
 }
 
-func p(sph *Sph, value string, i int) {
-	mutable := reflect.ValueOf(sph).Elem()
-	elem1 := reflect.TypeOf(sph).Elem().Field(i).Name
+func (h *Sph) setData(value string, i int) {
+	mutable := reflect.ValueOf(h).Elem()
+	elem1 := reflect.TypeOf(h).Elem().Field(i).Name
 	elem := mutable.FieldByName(elem1)
 	if elem.CanSet() {
-		switch reflect.TypeOf(sph).Elem().Field(i).Type.String() {
+		switch reflect.TypeOf(h).Elem().Field(i).Type.String() {
 		case "string":
 			elem.SetString(value)
 		case "int":
-			if v,err := strconv.Atoi(value); err != nil {
+			if v,err := strconv.Atoi(value); err == nil {
 				elem.SetInt(int64(v))
-
 			}
 		}
 	}
