@@ -1,18 +1,20 @@
-package routers
+package socket
 
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"fmt"
+	"jmcs/app/routers"
 )
 
 func init()  {
+	routers := routers.Router
 
-	Router.GET("/", func(c *gin.Context) {
+	routers.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "Hello World")
 	})
 
-	Router.GET("/post", func(c *gin.Context) {
+	routers.GET("/post", func(c *gin.Context) {
 		id := c.Query("id")
 		page := c.DefaultQuery("page", "0")
 		name := c.PostForm("name")
@@ -24,7 +26,7 @@ func init()  {
 
 	})
 
-	Router.GET("/form_post", func(c *gin.Context) {
+	routers.GET("/form_post", func(c *gin.Context) {
 		message := c.Query("message")
 		nick := c.DefaultQuery("nick", "anonymous")
 

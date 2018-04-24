@@ -48,6 +48,6 @@ func (p Port) CheckEnabled(ip net.IP) bool {
 	return true
 }
 
-func (p Port) checkconnd(ip net.IP) {
+func (p Port) checkConnd(ip net.IP) {
 
 }
