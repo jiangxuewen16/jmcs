@@ -14,7 +14,7 @@ const (
 
 func init() {
 
-	//初始化所有配置
+	//初始化所有配置 todo：需不需要放到core.go里面去
 	filePaths := utils.GetPathFilePath(CONFIG_PATH, utils.Suffix)
 	for _, filePath := range filePaths {
 		fileName := strings.Trim(path.Base(filePath), path.Ext(filePath))
