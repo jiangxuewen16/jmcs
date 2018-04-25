@@ -8,7 +8,7 @@ import (
 )
 
 //sph  -> socket protocol head
-type Sph struct {
+type Head struct {
 	Protocol string `json:"Protocol"`		//协议
 	RequstRouter string `json:"Requst-router"`		//访问路由
 	StatusCode int `json:"Status-code"`		 //传输状态码
@@ -21,7 +21,7 @@ type Sph struct {
 }
 
 /*解析socket约定的数据到结构体*/
-func (h Sph) parse(s string) {
+func (h Head) parse(s string) {
 	 headStrs := strings.Split(s, "\r\n\r\n")
 	for i,headStr := range headStrs {
 		if i == 0 {		//第一行数据是协议
@@ -34,7 +34,7 @@ func (h Sph) parse(s string) {
 
 }
 
-func (h *Sph) setData(value string, i int) {
+func (h *Head) setData(value string, i int) {
 	mutable := reflect.ValueOf(h).Elem()
 	elem1 := reflect.TypeOf(h).Elem().Field(i).Name
 	elem := mutable.FieldByName(elem1)

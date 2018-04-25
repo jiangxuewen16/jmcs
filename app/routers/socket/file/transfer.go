@@ -5,11 +5,13 @@ import (
 	"net/http"
 	"fmt"
 	"jmcs/app/routers"
+	"jmcs/app/controllers/socket/file"
 )
 
 func init()  {
 	routers := routers.Router
 
+	file.FileTransController{}.MultiTrans()
 	routers.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "Hello World")
 	})
