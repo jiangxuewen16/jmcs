@@ -15,6 +15,7 @@ func (c Controller) setActionName(actionName string){
 	c.ActionName = actionName
 }
 
-func (c Controller) setControllerName(cName string)  {
+func (c Controller) setControllerName(cName string) {
 	c.ControllerName = cName
 }
+

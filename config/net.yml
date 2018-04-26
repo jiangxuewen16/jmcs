@@ -1,4 +1,4 @@
-web:
+http:
     enable: true
     port: 8080
 wbSocket:

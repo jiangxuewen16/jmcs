@@ -1,6 +1,6 @@
-package routers
+package http
 
-import 	"github.com/gin-gonic/gin"
+import "github.com/gin-gonic/gin"
 
 var Router *gin.Engine
 

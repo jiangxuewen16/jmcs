@@ -7,6 +7,7 @@ import (
 	"github.com/goinggo/mapstructure"
 	"net"
 	"fmt"
+	"errors"
 )
 
 type socket struct {
@@ -32,6 +33,11 @@ func init() {
 	Conf = socket{}
 	err := mapstructure.Decode(baseConfig, &Conf) //解析socket配置
 	utils.CheckErr(err)
+
+	if ok := Conf.port.CheckEnabled(nil); ok {
+		err := errors.New("端口" + Conf.port.String() + "已被占用，请更换端口")
+		utils.CheckErr(err)
+	}
 }
 
 func Run() {
@@ -39,7 +45,7 @@ func Run() {
 		return
 	}
 
-	server := ":" + Conf.port.ToString()
+	server := ":" + Conf.port.String()
 	tcpAddr, err := net.ResolveTCPAddr("tcp", server)
 	utils.CheckErr(err)
 
@@ -71,6 +77,9 @@ func listenAddr(tcpAddr *net.TCPAddr) *net.TCPListener {
 /*socket业务具体处理*/
 func handleTcp(conn net.Conn) {
 	for {
+
+
+		//////////////////////////////
 		buf := make([]byte, 512)
 
 		conn.Read(buf)		//todo：读取数据，需要按约定处理

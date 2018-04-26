@@ -9,7 +9,7 @@ import (
 
 func main() {
 
-	core.Run()
+	core.Start()
 
 }
 

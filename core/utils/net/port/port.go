@@ -25,18 +25,18 @@ func (p Port) toInt() int {
 	return int(p)
 }
 
-func (p Port) ToString() string {
+func (p Port) String() string {
 	return strconv.Itoa(p.toInt())
 }
 
-func (p Port) CheckEnabled(ip net.IP) bool {
+func (p Port) CheckEnabled(ip *net.IP) bool {
 	/*默认本机ip*/
 	if ip == nil {
-		ip = net.IP{127,0,0,1}
+		ip = &net.IP{127,0,0,1}
 	}
 
 	tcpAddr := net.TCPAddr{
-		IP: ip,
+		IP: *ip,
 		Port: p.toInt(),
 	}
 

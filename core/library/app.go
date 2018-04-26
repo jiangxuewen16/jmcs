@@ -1,11 +1,12 @@
-package core
+package library
 
 import (
-	"jmcs/core/utils"
-	"jmcs/app/routers"
-	"os"
-	"path"
 	"strings"
+	"path"
+	"os"
+	"jmcs/core/utils"
+	"jmcs/core/library/socket"
+	"jmcs/core/library/http"
 )
 
 const (
@@ -26,5 +27,11 @@ func init() {
 }
 
 func Run() {
-	routers.Router.Run(":8000")
+	http.Run()			//启动web服务
+	socket.Run()		//启动socket
+	//todo:websoket
+
+	//todo: Hook::listen 切点，tp那种
+
+
 }
