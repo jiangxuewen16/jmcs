@@ -74,8 +74,9 @@ func listenAddr(tcpAddr *net.TCPAddr) *net.TCPListener {
 	return listen
 }
 
-/*socket业务具体处理*/
+/*socket业务具体处理 todo:这里调用路由合不合理*/
 func handleTcp(conn net.Conn) {
+
 	for {
 
 

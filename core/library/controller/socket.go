@@ -13,6 +13,10 @@ type SocketController struct {
 	//todo:socket业务相关的属性
 }
 
+type SocketControllerInterface interface {
+	Init(conn *net.Conn, h socket.Head)
+}
+
 func (sc SocketController) HandleHead(conn *net.Conn, h socket.Head){
 
 }
