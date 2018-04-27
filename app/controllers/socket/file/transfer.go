@@ -7,5 +7,5 @@ type FileTransController struct {
 }
 
 func (f FileTransController) MultiTrans()  {
-
+	body := f.Head.Body
 }

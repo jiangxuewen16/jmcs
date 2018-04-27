@@ -4,6 +4,7 @@ import (
 	"jmcs/core/library/socket"
 	"net"
 	"jmcs/core/library/controller"
+	"reflect"
 )
 
 type SRouter map[string] controller.SocketControllerInterface
@@ -17,12 +18,19 @@ type HandleFunc func(conn *net.Conn, h Head)
 var Router SRouter
 
 /*添加路由*/
-func Add(pattern string, h controller.SocketControllerInterface) {
+func Add(pattern string, h controller.SocketControllerInterface, method string) {
 	Router[pattern] = h
 }
 
 func Handle(pattern string, conn *net.Conn, h Head){
 	HandleFunc := Router[pattern]
 	HandleFunc.Init(conn, h)
-	HandleFunc(conn, h)
+	HandleFunc.
+}
+
+func Mapper(h controller.SocketControllerInterface, pattern string)  {
+	sc := reflect.ValueOf(h)
+	var params []reflect.Value
+
+	sc.MethodByName(pattern)
 }

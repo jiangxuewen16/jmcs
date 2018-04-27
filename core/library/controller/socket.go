@@ -9,7 +9,7 @@ import (
 type SocketController struct {
 	library.Controller
 	Head socket.Head
-	conn *net.Conn
+	Conn *net.Conn
 	//todo:socket业务相关的属性
 }
 
@@ -17,12 +17,11 @@ type SocketControllerInterface interface {
 	Init(conn *net.Conn, h socket.Head)
 }
 
-func (sc SocketController) HandleHead(conn *net.Conn, h socket.Head){
-
+func (sc SocketController) Init(conn *net.Conn, h socket.Head){
+	sc.Conn = conn
+	sc.Head = h
 }
 
-func (sc SocketController) Init(conn *net.Conn, h socket.Head){
-	sc.conn = conn
-	sc.Head = h
+func (sc SocketController) Handle()  {
 
 }
