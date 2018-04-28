@@ -49,7 +49,7 @@ func Run() {
 	tcpAddr, err := net.ResolveTCPAddr("tcp", server)
 	utils.CheckErr(err)
 
-	fmt.Println("启动监听tcp:",Conf.port)
+	fmt.Println("启动监听tcp:", Conf.port)
 	listen := listenAddr(tcpAddr)
 	fmt.Println("启动完成")
 
@@ -61,7 +61,7 @@ func Run() {
 			continue
 		}
 
-		go handleTcp(conn)
+		go handleTcp(&conn)
 	}
 
 }
@@ -75,17 +75,16 @@ func listenAddr(tcpAddr *net.TCPAddr) *net.TCPListener {
 }
 
 /*socket业务具体处理 todo:这里调用路由合不合理*/
-func handleTcp(conn net.Conn) {
+func handleTcp(conn *net.Conn) {
 
 	for {
 
-
-		//////////////////////////////
 		buf := make([]byte, 512)
+		(*conn).Read(buf) //todo：读取数据，需要按约定处理
 
-		conn.Read(buf)		//todo：读取数据，需要按约定处理
+		head := Head{}
+		head.parse(buf)
 
-		conn.Write()		//todo：写入返回数据
-
+		Handle(conn, head)
 	}
 }

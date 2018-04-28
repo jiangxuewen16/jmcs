@@ -4,6 +4,7 @@ http:
 wbSocket:
     enable: true
     port: 8002
+    defaultRouter:
 socket:
     enable: true
     port: 8001

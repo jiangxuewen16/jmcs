@@ -7,5 +7,7 @@ type FileTransController struct {
 }
 
 func (f FileTransController) MultiTrans()  {
-	body := f.Head.Body
+	body := f.Body
+
+	f.Write([]byte(body))
 }

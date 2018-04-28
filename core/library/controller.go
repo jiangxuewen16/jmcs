@@ -5,6 +5,8 @@ type Controller struct {
 	BaseUrl string
 	ActionName string
 	ControllerName string
+	methodMapping map[string]func()
+	Body string
 }
 
 func (c Controller) setBashUrl(url string){

@@ -21,7 +21,8 @@ type Head struct {
 }
 
 /*解析socket约定的数据到结构体*/
-func (h Head) parse(s string) {
+func (h Head) parse(b []byte) {
+	s := string(b)
 	 headStrs := strings.Split(s, "\r\n\r\n")
 	for i,headStr := range headStrs {
 		if i == 0 {		//第一行数据是协议

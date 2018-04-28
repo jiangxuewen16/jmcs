@@ -5,32 +5,58 @@ import (
 	"net"
 	"jmcs/core/library/controller"
 	"reflect"
+	"strings"
 )
 
-type SRouter map[string] controller.SocketControllerInterface
+type SRouter map[string]ControllerRegister
 
 type HandleFunc func(conn *net.Conn, h Head)
 
-/*type Handle interface {
-	HandleFunc()
-}*/
+type ControllerRegister struct {
+	controllerRouter *controller.SocketControllerInterface
+	method           string
+}
 
 var Router SRouter
 
 /*添加路由*/
-func Add(pattern string, h controller.SocketControllerInterface, method string) {
-	Router[pattern] = h
+func Add(pattern string, h *controller.SocketControllerInterface, method string) {
+
+	checkPattern(pattern)
+
+	controllerRegister := ControllerRegister{h, method}
+	Router[pattern] = controllerRegister
 }
 
-func Handle(pattern string, conn *net.Conn, h Head){
-	HandleFunc := Router[pattern]
-	HandleFunc.Init(conn, h)
-	HandleFunc.
+/*检查是否能注册路由*/
+func checkPattern(pattern string) {
+	if _, ok := Router[pattern]; ok {
+		panic("[" + pattern + "]" + "已存在，不能重复注册路由")
+	}
 }
 
-func Mapper(h controller.SocketControllerInterface, pattern string)  {
-	sc := reflect.ValueOf(h)
-	var params []reflect.Value
+/*处理路由*/
+func Handle(conn *net.Conn, h Head) {
+	if len(h.RequstRouter) <= 0 {
+		panic("没有自定路由")  //todo:404
+	}
+	HandleFunc, ok := Router[h.RequstRouter]
+	if !ok {
+		panic("该路由不存在")  //todo:404
+	}
 
-	sc.MethodByName(pattern)
+	handler := *HandleFunc.controllerRouter
+	handler.Init(conn, h)
+
+	Mapper(handler, HandleFunc.method)
+}
+
+/*运行router 的 controller的方法*/
+func Mapper(h controller.SocketControllerInterface, method string) {
+	reflectVal := reflect.ValueOf(&h)
+	if val := reflectVal.MethodByName(method); val.IsValid() {
+		val.Call(nil)
+	} else {
+		panic("method doesn't exist in the controller " + method)
+	}
 }
