@@ -25,13 +25,12 @@ func GetPathFileInfo(dir string, suffixs []string) []os.FileInfo {
 		return fileList
 	}
 
-	var suffixFiles = []os.FileInfo{}
+	var suffixFiles = make([]os.FileInfo,0,len(fileList))
+
 	for _, fileInfo := range fileList {
 		suffix := path.Ext(fileInfo.Name())
-		i := 0
 		if inArray(suffix, suffixs) {
-			suffixFiles[i] = fileInfo
-			i++
+			suffixFiles = append(suffixFiles, fileInfo)
 		}
 	}
 	return suffixFiles
@@ -51,9 +50,10 @@ func GetPathFileName(dir string, suffixs []string) []string {
 func GetPathFilePath(dir string, suffixs []string) []string {
 	fileInfos := GetPathFileInfo(dir, suffixs)
 
-	filePaths := []string{}
-	for key,fileInfo := range fileInfos {
-		filePaths[key] = dir + fileInfo.Name()
+	filePaths := make([]string,0, len(fileInfos))
+	for _,fileInfo := range fileInfos {
+
+		filePaths = append(filePaths, dir + "/" + fileInfo.Name())
 	}
 	return filePaths
 }

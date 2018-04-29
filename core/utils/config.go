@@ -1,27 +1,31 @@
 package utils
 
 import (
-	"io"
 	"io/ioutil"
 
 	"gopkg.in/yaml.v2"
+	"os"
+	"strings"
+	"path"
 )
 
 type Config map[string]interface{}
 
-var Configs = map[string]Config{} //todo:是否把总配置放这里，应不应该放到业务中去
+var Configs = make(map[string]Config) //todo:是否把总配置放这里，应不应该放到业务中去
 
 var Suffix = []string{".yml"}
 
-func (c Config) Resolve(f io.Reader, configName string) {
+func (c Config) Resolve(filePath string) {
+	f, err := os.Open(filePath)
+	CheckErr(err)
 
-	config := make(map[string]interface{})
+	fileName := strings.Trim(path.Base(filePath), path.Ext(filePath))
 	b, err := ioutil.ReadAll(f)
 	CheckErr(err)
 
-	yaml.Unmarshal(b, config)
+	yaml.Unmarshal(b, &c)
 
-	Configs[configName] = config
+	Configs[fileName] = c
 }
 
 /*func aa(conf *interface{}, confName string) {

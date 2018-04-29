@@ -6,4 +6,5 @@ var Router *gin.Engine
 
 func init()  {
 	Router = gin.Default()
+
 }

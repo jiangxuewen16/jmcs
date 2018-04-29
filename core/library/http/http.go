@@ -6,44 +6,44 @@ import (
 	"jmcs/core/utils"
 	"jmcs/core/utils/net/port"
 	"errors"
-	appRouter "jmcs/app/routers/http"
+	"fmt"
 )
 
 type http struct {
-	enable      bool
-	port        port.Port
-	heartEnable bool
+	enable      bool		`json:"enable"`
+	port        port.Port	`json:"port"`
 }
 
-var Conf http
-var ipAddr string
+var config http
 
 const (
 	CONF_NAME = "net.http"
 )
 
-func init() {
+func initConf() {
 	/*socket配置*/
-	confs := strings.Split(CONF_NAME, ",")
+	confs := strings.Split(CONF_NAME, ".")
+	fmt.Print(utils.Configs)
 	baseConfig, ok := utils.Configs[confs[0]][confs[1]]
 	if !ok {
-		Conf = http{enable: false}
+		return
 	}
 
-	Conf = http{}
-	err := mapstructure.Decode(baseConfig, &Conf) //解析socket配置
+	err := mapstructure.Decode(baseConfig, &config) //解析socket配置
 	utils.CheckErr(err)
 
-	if ok := Conf.port.CheckEnabled(nil); ok {
-		err := errors.New("端口" + Conf.port.String() + "已被占用，请更换端口")
+	if !config.enable {
+		return
+	}
+
+	if ok := config.port.CheckEnabled(nil); ok {
+		err := errors.New("端口" + config.port.String() + "已被占用，请更换端口")
 		utils.CheckErr(err)
 	}
 }
 
 func Run() {
-	if !Conf.enable {
-		return
-	}
+	initConf()
 
-	appRouter.Router.Run(":" + ipAddr)
+	Router.Run()
 }
