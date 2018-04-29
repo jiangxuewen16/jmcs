@@ -6,6 +6,7 @@ import (
 	"path"
 )
 
+/*判断文件是否存在*/
 func PathExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
@@ -17,6 +18,7 @@ func PathExists(path string) (bool, error) {
 	return false, err
 }
 
+/*获取文件夹中所有自定后缀文件的信息*/
 func GetPathFileInfo(dir string, suffixs []string) []os.FileInfo {
 	fileList, err := ioutil.ReadDir(dir)
 	CheckErr(err)
@@ -36,6 +38,7 @@ func GetPathFileInfo(dir string, suffixs []string) []os.FileInfo {
 	return suffixFiles
 }
 
+/*获取文件夹中所有自定后缀文件的文件名*/
 func GetPathFileName(dir string, suffixs []string) []string {
 	fileInfos := GetPathFileInfo(dir, suffixs)
 	var fileNames = []string{}
@@ -47,6 +50,7 @@ func GetPathFileName(dir string, suffixs []string) []string {
 	return fileNames
 }
 
+/*获取文件夹中所有自定后缀文件的文件名（带路径）*/
 func GetPathFilePath(dir string, suffixs []string) []string {
 	fileInfos := GetPathFileInfo(dir, suffixs)
 
@@ -56,4 +60,17 @@ func GetPathFilePath(dir string, suffixs []string) []string {
 		filePaths = append(filePaths, dir + "/" + fileInfo.Name())
 	}
 	return filePaths
+}
+
+/**
+ * 创建文件夹
+ * 文件夹 path
+ * 是否递归创建文件夹 p true - 是， false - 否
+ */
+func MkDir(path string, p bool) bool {
+	if p {
+		os.MkdirAll(path, 0777)
+	} else {
+
+	}
 }

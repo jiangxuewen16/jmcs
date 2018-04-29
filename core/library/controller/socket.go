@@ -15,6 +15,7 @@ type SocketController struct {
 
 type SocketControllerInterface interface {
 	Init(conn *net.Conn, h socket.Head)
+	Write(b []byte)
 }
 
 func (sc SocketController) Init(conn *net.Conn, h socket.Head){
