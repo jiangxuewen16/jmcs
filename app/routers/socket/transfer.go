@@ -1,4 +1,4 @@
-package file
+package socket
 
 import (
 	"jmcs/core/library/socket"

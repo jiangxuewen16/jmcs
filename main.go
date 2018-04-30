@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-
+	/*应用启动*/
 	core.Start()
 
 }

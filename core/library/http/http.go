@@ -7,11 +7,13 @@ import (
 	"jmcs/core/utils/net/port"
 	"errors"
 	"fmt"
+	R "jmcs/app/routers/http"			//初始化该包
+
 )
 
 type http struct {
-	enable      bool		`json:"enable"`
-	port        port.Port	`json:"port"`
+	Enable      bool		`json:"enable"`
+	Port        port.Port	`json:"port"`
 }
 
 var config http
@@ -32,12 +34,12 @@ func initConf() {
 	err := mapstructure.Decode(baseConfig, &config) //解析socket配置
 	utils.CheckErr(err)
 
-	if !config.enable {
+	if !config.Enable {
 		return
 	}
 
-	if ok := config.port.CheckEnabled(nil); ok {
-		err := errors.New("端口" + config.port.String() + "已被占用，请更换端口")
+	if ok := config.Port.CheckEnabled(nil); ok {
+		err := errors.New("端口" + config.Port.String() + "已被占用，请更换端口")
 		utils.CheckErr(err)
 	}
 }
@@ -45,5 +47,5 @@ func initConf() {
 func Run() {
 	initConf()
 
-	Router.Run()
+	R.Router.Run()
 }

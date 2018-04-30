@@ -3,16 +3,19 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"fmt"
-	 h "jmcs/core/library/http"
 	"net/http"
+
 )
 
+var Router = gin.Default()
+
 func init()  {
-	h.Router.GET("/", func(c *gin.Context) {
+
+	Router.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "Hello World")
 	})
 
-	h.Router.GET("/post", func(c *gin.Context) {
+	Router.GET("/post", func(c *gin.Context) {
 		id := c.Query("id")
 		page := c.DefaultQuery("page", "0")
 		name := c.PostForm("name")
@@ -24,7 +27,7 @@ func init()  {
 
 	})
 
-	h.Router.GET("/form_post", func(c *gin.Context) {
+	Router.GET("/form_post", func(c *gin.Context) {
 		message := c.Query("message")
 		nick := c.DefaultQuery("nick", "anonymous")
 

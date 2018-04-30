@@ -61,16 +61,3 @@ func GetPathFilePath(dir string, suffixs []string) []string {
 	}
 	return filePaths
 }
-
-/**
- * 创建文件夹
- * 文件夹 path
- * 是否递归创建文件夹 p true - 是， false - 否
- */
-func MkDir(path string, p bool) bool {
-	if p {
-		os.MkdirAll(path, 0777)
-	} else {
-
-	}
-}

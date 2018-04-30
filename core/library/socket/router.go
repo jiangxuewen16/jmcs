@@ -20,7 +20,7 @@ type ControllerRegister struct {
 var Router SRouter
 
 /*添加路由*/
-func Add(pattern string, h *controller.SocketControllerInterface, method string) {
+func Add(pattern string, h controller.SocketControllerInterface, method string) {
 
 	checkPattern(pattern)
 

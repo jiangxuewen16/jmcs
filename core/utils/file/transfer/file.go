@@ -13,6 +13,7 @@ type FileFirst struct {
 
 type FilePackage struct {
 	BufSize int   //每个发送包的大小
+
 	Body []byte	//文件数据字节
 }
 
