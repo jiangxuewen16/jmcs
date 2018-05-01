@@ -21,7 +21,7 @@ type Head struct {
 }
 
 /*解析socket约定的数据到结构体*/
-func (h Head) parse(b []byte) {
+func (h *Head) parse(b []byte) {
 	s := string(b)
 	headStrs := strings.Split(s, "\r\n\r\n")
 	for i,headStr := range headStrs {
@@ -30,7 +30,7 @@ func (h Head) parse(b []byte) {
 			continue
 		}
 		keyAndValue := strings.Split(headStr,":")
-		(&h).setData(keyAndValue[1], i)
+		h.setData(keyAndValue[1], i)
 	}
 
 }

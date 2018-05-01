@@ -4,7 +4,7 @@ import (
 	"jmcs/core/utils"
 	"jmcs/core/library/socket"
 	"jmcs/core/library/http"
-	_ "jmcs/app/routers/socket"
+	_ "jmcs/app/routers/socket" //初始化socket路由 todo:这里初始化路由
 )
 
 const (
@@ -23,7 +23,7 @@ func init() {
 func Run() {
 
 	/*启动socket*/
-	go socket.Run()		//todo:这里异步执行
+	go socket.Run() //todo:这里异步执行防止给短路，可以接着执行http应用
 
 	/*启动web服务*/
 	http.Run()

@@ -7,5 +7,5 @@ import (
 
 func init()  {
 
-	socket.Add("file/transfer", &file.FileTransController{}, "MultiTrans")
+	socket.Add("/file/transfer", &file.FileTransController{}, "MultiTrans")
 }

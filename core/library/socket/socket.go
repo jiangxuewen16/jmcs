@@ -83,9 +83,13 @@ func listenAddr(tcpAddr *net.TCPAddr) *net.TCPListener {
 
 /*socket业务具体处理 todo:这里调用路由合不合理*/
 func handleTcp(conn *net.Conn) {
+	defer func(){
+		if err := recover(); err != nil {
+			fmt.Println(":::::" , err, ":::::")
+		}
+	}()
 
 	for {
-
 		buf := make([]byte, 512)
 		(*conn).Read(buf) //todo：读取数据，需要按约定处理
 
