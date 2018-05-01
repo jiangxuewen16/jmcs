@@ -1,9 +1,11 @@
 package file
 
-import "jmcs/core/library/controller"
+import (
+	"jmcs/core/library/socket"
+)
 
 type FileTransController struct {
-	controller.SocketController
+	socket.SocketController
 }
 
 func (f FileTransController) MultiTrans()  {

@@ -1,31 +1,29 @@
 package socket
 
 import (
-	"jmcs/core/library/socket"
 	"net"
-	"jmcs/core/library/controller"
 	"reflect"
-	"strings"
+	"fmt"
 )
-
-type SRouter map[string]ControllerRegister
 
 type HandleFunc func(conn *net.Conn, h Head)
 
 type ControllerRegister struct {
-	controllerRouter *controller.SocketControllerInterface
+	controllerRouter *SocketControllerInterface
 	method           string
 }
 
-var Router SRouter
+var Router = make(map[string]ControllerRegister)
 
 /*添加路由*/
-func Add(pattern string, h controller.SocketControllerInterface, method string) {
+func Add(pattern string, h SocketControllerInterface, method string) {
 
 	checkPattern(pattern)
 
-	controllerRegister := ControllerRegister{h, method}
+	controllerRegister := ControllerRegister{&h, method}
 	Router[pattern] = controllerRegister
+
+	fmt.Println("pattern")
 }
 
 /*检查是否能注册路由*/
@@ -38,11 +36,11 @@ func checkPattern(pattern string) {
 /*处理路由*/
 func Handle(conn *net.Conn, h Head) {
 	if len(h.RequstRouter) <= 0 {
-		panic("没有自定路由")  //todo:404
+		panic("没有自定路由") //todo:404
 	}
 	HandleFunc, ok := Router[h.RequstRouter]
 	if !ok {
-		panic("该路由不存在")  //todo:404
+		panic("该路由不存在") //todo:404
 	}
 
 	handler := *HandleFunc.controllerRouter
@@ -52,7 +50,7 @@ func Handle(conn *net.Conn, h Head) {
 }
 
 /*运行router 的 controller的方法*/
-func Mapper(h controller.SocketControllerInterface, method string) {
+func Mapper(h SocketControllerInterface, method string) {
 	reflectVal := reflect.ValueOf(&h)
 	if val := reflectVal.MethodByName(method); val.IsValid() {
 		val.Call(nil)

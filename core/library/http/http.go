@@ -45,7 +45,9 @@ func initConf() {
 }
 
 func Run() {
+	/*初始化http应用配置*/
 	initConf()
 
+	/*启动http应用*/
 	R.Router.Run()
 }

@@ -2,8 +2,9 @@ package library
 
 import (
 	"jmcs/core/utils"
-	//"jmcs/core/library/socket"
+	"jmcs/core/library/socket"
 	"jmcs/core/library/http"
+	_ "jmcs/app/routers/socket"
 )
 
 const (
@@ -20,8 +21,13 @@ func init() {
 }
 
 func Run() {
-	http.Run() //启动web服务
-	//socket.Run()		//启动socket
+
+	/*启动socket*/
+	go socket.Run()		//todo:这里异步执行
+
+	/*启动web服务*/
+	http.Run()
+
 	//todo:websoket
 
 	//todo: Hook::listen 切点，tp那种

@@ -11,45 +11,53 @@ import (
 )
 
 type socket struct {
-	enable      bool
-	port        port.Port
-	heartEnable bool
+	Enable      bool
+	Port        port.Port
+	HeartEnable bool
 }
 
-var Conf socket
+var conf socket
 
 const (
-	CONF_NAME = "net.socket"
+	CONF_NAME = "net.socket" //配置名称，靠这个解析出该应用具体配置
 )
 
-func init() {
+func Run() {
+	/*初始化socket应用配置*/
+	initconf()
+
+	/*启动socket服务端*/
+	start()
+}
+
+func initconf() {
 	/*socket配置*/
-	confs := strings.Split(CONF_NAME, ",")
-	baseConfig, ok := utils.Configs[confs[0]][confs[1]]
+	confs := strings.Split(CONF_NAME, ".")
+	baseconfig, ok := utils.Configs[confs[0]][confs[1]]
 	if !ok {
-		Conf = socket{enable: false}
+		conf = socket{Enable: false}
 	}
 
-	Conf = socket{}
-	err := mapstructure.Decode(baseConfig, &Conf) //解析socket配置
+	conf = socket{}
+	err := mapstructure.Decode(baseconfig, &conf) //解析socket配置
 	utils.CheckErr(err)
 
-	if ok := Conf.port.CheckEnabled(nil); ok {
-		err := errors.New("端口" + Conf.port.String() + "已被占用，请更换端口")
+	if !conf.Enable {
+		return
+	}
+
+	if ok := conf.Port.CheckEnabled(nil); ok {
+		err := errors.New("端口" + conf.Port.String() + "已被占用，请更换端口")
 		utils.CheckErr(err)
 	}
 }
 
-func Run() {
-	if !Conf.enable {
-		return
-	}
-
-	server := ":" + Conf.port.String()
+func start()  {
+	server := ":" + conf.Port.String()
 	tcpAddr, err := net.ResolveTCPAddr("tcp", server)
 	utils.CheckErr(err)
 
-	fmt.Println("启动监听tcp:", Conf.port)
+	fmt.Println("启动监听tcp:", conf.Port)
 	listen := listenAddr(tcpAddr)
 	fmt.Println("启动完成")
 
@@ -63,7 +71,6 @@ func Run() {
 
 		go handleTcp(&conn)
 	}
-
 }
 
 /*监听tcp端口*/
