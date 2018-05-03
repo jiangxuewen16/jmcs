@@ -27,7 +27,7 @@ func GetPathFileInfo(dir string, suffixs []string) []os.FileInfo {
 		return fileList
 	}
 
-	var suffixFiles = make([]os.FileInfo,0,len(fileList))
+	var suffixFiles = make([]os.FileInfo, 0, len(fileList))
 
 	for _, fileInfo := range fileList {
 		suffix := path.Ext(fileInfo.Name())
@@ -54,10 +54,23 @@ func GetPathFileName(dir string, suffixs []string) []string {
 func GetPathFilePath(dir string, suffixs []string) []string {
 	fileInfos := GetPathFileInfo(dir, suffixs)
 
-	filePaths := make([]string,0, len(fileInfos))
-	for _,fileInfo := range fileInfos {
+	filePaths := make([]string, 0, len(fileInfos))
+	for _, fileInfo := range fileInfos {
 
-		filePaths = append(filePaths, dir + "/" + fileInfo.Name())
+		filePaths = append(filePaths, dir+"/"+fileInfo.Name())
 	}
 	return filePaths
+}
+
+func MktempDir(dir, prefix string) (string, error) {
+	if ok, err := PathExists(dir); !ok || err != nil {
+		os.MkdirAll(dir, 0777) //todo:权限？？？？
+	}
+
+	path, err := ioutil.TempDir(dir, prefix)
+	if err != nil {
+		return "", err
+	}
+
+	return path, err
 }

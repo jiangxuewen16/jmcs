@@ -52,10 +52,12 @@ func (c SocketController) setControllerName(cName string) {
 	c.ControllerName = cName
 }
 
+/*获取body信息*/
 func (s SocketController) getBody() []byte {
 	return s.Body
 }
 
+/*解析body*/
 func (s SocketController) ResolveBody(proto interface{})  {
 	body := s.getBody()
 	fmt.Println(string(body))

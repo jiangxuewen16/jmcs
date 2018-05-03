@@ -9,35 +9,54 @@ import (
 	"strconv"
 )
 
+//todo:接收数据的时候统计文件接收了多少个包
+
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 }
 
 type ServerTransfer struct {
-	FilePackage
+	SendPackage
 	res          string
-	FileName     string		//源文件名
-	tempFileName string //保存临时文件名称
-	//data         =make([]byte, 1024*1024) //用于保存接收的数据的切片
 	by []byte
-	//databuf      = bytes.NewBuffer(by) //数据缓冲变量
-	FileNum int //当前协程接收的数据在原文件中的位置
+
 }
+
+var receiveNum map[string]int //接收文件的接收数量
 
 /*
 *   文件接收方法
-*   2013-09-26
-*   LvanNeo
 *
 *   con 连接成功的客户端连接
  */
 func (s ServerTransfer) ReceiveFile(con net.Conn) {
 
 	var (
-		data    = make([]byte, 1024*1024) //用于保存接收的数据的切片
-		by      []byte
-		databuf = bytes.NewBuffer(by) //数据缓冲变量
+		//data    = make([]byte, 1024*1024) //用于保存接收的数据的切片
+		//by      []byte
+		//databuf = bytes.NewBuffer(by) //数据缓冲变量
+		position = s.Position
+		token = s.Token
 	)
+
+	num,ok := receiveNum[s.Token]
+	if !ok {
+		tempFileName := token + strconv.Itoa(position)		//	临时文件名
+		fmt.Println("创建临时文件：", tempFileName)
+		fout, err := os.Create(tempFileName)
+		if err != nil {
+			fmt.Println("创建临时文件错误", tempFileName)
+			return
+		}
+		fout.Close()
+
+		receiveNum[s.Token] = 1
+	} else {
+		writeTempFileEnd(tempFileName, data[0:length])
+	}
+
+	receiveNum[s.Token] = 1
+
 
 	fmt.Println("开始接受文件：【" + s.FileName +"】")
 	j := 0 //标记接收数据的次数
@@ -50,7 +69,6 @@ func (s ServerTransfer) ReceiveFile(con net.Conn) {
 		}
 
 		if 0 == j {
-
 			s.res = string(data[0:8])
 			if "fileover" == res { //判断是否为发送结束指令，且结束指令会在第一次接收的数据中
 				xienum := int(data[8])
@@ -86,8 +104,6 @@ func (s ServerTransfer) ReceiveFile(con net.Conn) {
 
 /*
 *   把数据写入指定的临时文件中
-*   2013-09-26
-*   LvanNeo
 *
 *   fileName    临时文件名
 *   data        接收的数据
@@ -106,8 +122,6 @@ func writeTempFileEnd(fileName string, data []byte) {
 
 /*
 *   根据临时文件数量及有效文件名称生成文件合并规则进行文件合并
-*   2013-09-26
-*   LvanNeo
 *
 *   connumber   临时文件数量
 *   filename    有效文件名称
@@ -135,8 +149,6 @@ func mainMergeFile(connumber int, filename string) {
 
 /*
 *   将指定临时文件合并到有效文件中
-*   2013-09-26
-*   LvanNeo
 *
 *   rfilename   临时文件名称
 *   wfile       有效文件

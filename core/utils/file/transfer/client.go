@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+//todo:文件发送的时候，需要先在客户端储存好目录结构，上传完成一个从结构里面删除一个，还可以用来补上传
+
 type ClientTransfer struct {
 	conn *net.Conn `json:"conn"` //socket连接
 
