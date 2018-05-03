@@ -13,7 +13,7 @@ type Config map[string]interface{}
 
 var Configs = make(map[string]Config) //todo:是否把总配置放这里，应不应该放到业务中去
 
-var Suffix = []string{".yml"}
+var Suffix = []string{".yml"}		//todo:现在只支持yaml配置格式
 
 func (c Config) Resolve(filePath string) {
 	f, err := os.Open(filePath)
@@ -27,16 +27,3 @@ func (c Config) Resolve(filePath string) {
 
 	Configs[fileName] = c
 }
-
-/*func aa(conf *interface{}, confName string) {
-	//socket配置
-	confs := strings.Split(confName, ",")
-	baseConfig, ok := Configs[confs[0]][confs[1]]
-	if !ok {
-		Conf = http{enable: false}
-	}
-
-	Conf = http{}
-	err := mapstructure.Decode(baseConfig, &Conf) //解析socket配置
-	utils.CheckErr(err)
-}*/

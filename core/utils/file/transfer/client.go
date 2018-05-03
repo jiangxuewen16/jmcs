@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-type FileClientTransfer struct {
+type ClientTransfer struct {
 	conn *net.Conn `json:"conn"` //socket连接
 
 	label string `json:"label"` //master-主服务端(中心服务器)  slave-从服务器
@@ -20,7 +20,7 @@ type FileClientTransfer struct {
 	BufSize       int    `json:"buf_size"`        //单次发送数据的大小
 }
 
-func (f FileClientTransfer) TransferHandle() {
+func (f ClientTransfer) TransferHandle() {
 
 	fl, err := os.OpenFile(f.FileName, os.O_RDWR, 0666) //读写打开
 	if err != nil {
@@ -87,7 +87,7 @@ func (f FileClientTransfer) TransferHandle() {
 *   begin           当前协程拆分待发送文件中的开始位置
 *   end             当前协程拆分待发送文件中的结束位置
  */
-func (f FileClientTransfer) splitFile(c chan string, coroutineNum int, begin int64, end int64) {
+func (f ClientTransfer) splitFile(c chan string, coroutineNum int, begin int64, end int64) {
 	conn := *f.conn
 	size := f.BufSize
 	fileName := f.FileName
@@ -185,7 +185,7 @@ func (f FileClientTransfer) splitFile(c chan string, coroutineNum int, begin int
 *   mergeFileName   待合并的文件名
 *   coroutine       拆分文件的总个数
  */
-func (f FileClientTransfer) sendMergeCommand() {
+func (f ClientTransfer) sendMergeCommand() {
 	conn := *f.conn
 	mergeFileName := f.MergeFileName
 	coroutine := f.Coroutine

@@ -10,7 +10,7 @@ type FileTransController struct {
 }
 
 func (f FileTransController) MultiTrans()  {
-	file := &transfer.FileClientTransfer{}
+	file := &transfer.ClientTransfer{}
 	f.ResolveBody(file)
-	f.Write([]byte(file.MergeFileName))
+	f.Write([]byte("aaaa"))
 }

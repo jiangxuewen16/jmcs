@@ -13,13 +13,15 @@ func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 }
 
-type FileServerTransfer struct {
+type ServerTransfer struct {
+	FilePackage
 	res          string
-	tempFileName string                    //保存临时文件名称
+	FileName     string		//源文件名
+	tempFileName string //保存临时文件名称
 	//data         =make([]byte, 1024*1024) //用于保存接收的数据的切片
-	by           []byte
+	by []byte
 	//databuf      = bytes.NewBuffer(by) //数据缓冲变量
-	fileNum      int                   //当前协程接收的数据在原文件中的位置
+	FileNum int //当前协程接收的数据在原文件中的位置
 }
 
 /*
@@ -29,34 +31,27 @@ type FileServerTransfer struct {
 *
 *   con 连接成功的客户端连接
  */
-func receiveFile(con net.Conn) {
+func (s ServerTransfer) ReceiveFile(con net.Conn) {
 
 	var (
-		res          string
-		tempFileName string                    //保存临时文件名称
-		data         = make([]byte, 1024*1024) //用于保存接收的数据的切片
-		by           []byte
-		databuf      = bytes.NewBuffer(by) //数据缓冲变量
-		fileNum      int                   //当前协程接收的数据在原文件中的位置
+		data    = make([]byte, 1024*1024) //用于保存接收的数据的切片
+		by      []byte
+		databuf = bytes.NewBuffer(by) //数据缓冲变量
 	)
-	defer con.Close()
 
-	fmt.Println("新建立连接: ", con.RemoteAddr())
+	fmt.Println("开始接受文件：【" + s.FileName +"】")
 	j := 0 //标记接收数据的次数
 	for {
 		length, err := con.Read(data)
 		if err != nil {
-
-			// writeend(tempFileName, databuf.Bytes())
 			da := databuf.Bytes()
-			// fmt.Println("over", fileNum, len(da))
-			fmt.Printf("客户端 %v 已断开. %2d %d \n", con.RemoteAddr(), fileNum, len(da))
+			fmt.Printf("客户端 %v 已断开. %2d %d \n", con.RemoteAddr(), s.FileNum, len(da))
 			return
 		}
 
 		if 0 == j {
 
-			res = string(data[0:8])
+			s.res = string(data[0:8])
 			if "fileover" == res { //判断是否为发送结束指令，且结束指令会在第一次接收的数据中
 				xienum := int(data[8])
 				mergeFileName := string(data[9:length])
