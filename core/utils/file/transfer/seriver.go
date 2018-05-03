@@ -39,7 +39,7 @@ func (s ServerTransfer) ReceiveFile(con net.Conn) {
 		token = s.Token
 	)
 
-	num,ok := receiveNum[s.Token]
+	_,ok := receiveNum[s.Token]
 	if !ok {
 		tempFileName := token + strconv.Itoa(position)		//	临时文件名
 		fmt.Println("创建临时文件：", tempFileName)
@@ -53,6 +53,7 @@ func (s ServerTransfer) ReceiveFile(con net.Conn) {
 		receiveNum[s.Token] = 1
 	} else {
 		writeTempFileEnd(tempFileName, data[0:length])
+		receiveNum[s.Token]++
 	}
 
 	receiveNum[s.Token] = 1
