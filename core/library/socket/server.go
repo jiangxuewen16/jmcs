@@ -14,7 +14,7 @@ type Head struct {
 	StatusCode int `json:"Status-code"`		 //传输状态码
 	ContentType common.ContentType `json:"Content-type"`
 	Authentication string `json:"Authentication"`	//对于socket来说没实际意义
-	Body string `json:"Body"`		//请求body,用于存放具体传输数据
+	Body []byte `json:"Body"`		//请求body,用于存放具体传输数据
 
 	// userAgent []string `json:"User-agent"`
 	// accept []common.ContentType `json:"accept"`
@@ -29,7 +29,7 @@ func (h *Head) parse(b []byte) {
 			h.Protocol = headStr
 			continue
 		}
-		keyAndValue := strings.Split(headStr,":")
+		keyAndValue := strings.SplitN(headStr,":",2)
 		h.setData(keyAndValue[1], i)
 	}
 
@@ -40,13 +40,15 @@ func (h *Head) setData(value string, i int) {
 	elem1 := reflect.TypeOf(h).Elem().Field(i).Name
 	elem := mutable.FieldByName(elem1)
 	if elem.CanSet() {
-		switch reflect.TypeOf(h).Elem().Field(i).Type.String() {
-		case "string":
+		switch mutable.Field(i).Kind() {
+		case reflect.String:
 			elem.SetString(value)
-		case "int":
+		case reflect.Int:
 			if v,err := strconv.Atoi(value); err == nil {
 				elem.SetInt(int64(v))
 			}
+		case reflect.Slice:
+			elem.SetBytes([]byte(value))
 		}
 	}
 }

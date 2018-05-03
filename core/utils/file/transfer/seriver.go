@@ -13,6 +13,15 @@ func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 }
 
+type FileServerTransfer struct {
+	res          string
+	tempFileName string                    //保存临时文件名称
+	//data         =make([]byte, 1024*1024) //用于保存接收的数据的切片
+	by           []byte
+	//databuf      = bytes.NewBuffer(by) //数据缓冲变量
+	fileNum      int                   //当前协程接收的数据在原文件中的位置
+}
+
 /*
 *   文件接收方法
 *   2013-09-26
@@ -21,6 +30,7 @@ func init() {
 *   con 连接成功的客户端连接
  */
 func receiveFile(con net.Conn) {
+
 	var (
 		res          string
 		tempFileName string                    //保存临时文件名称

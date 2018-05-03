@@ -2,6 +2,8 @@ package socket
 
 import (
 	"net"
+	"encoding/json"
+	"fmt"
 )
 
 type SocketController struct {
@@ -9,7 +11,7 @@ type SocketController struct {
 	ActionName string
 	ControllerName string
 	methodMapping map[string]func()
-	Body string
+	Body []byte
 
 	Head Head
 	Conn *net.Conn
@@ -21,7 +23,7 @@ type SocketControllerInterface interface {
 	Write(b []byte)
 }
 
-func (sc SocketController) Init(conn *net.Conn, h Head){
+func (sc *SocketController) Init(conn *net.Conn, h Head){
 	sc.BaseUrl = h.RequstRouter
 	sc.Body = h.Body
 
@@ -48,4 +50,17 @@ func (c SocketController) setActionName(actionName string){
 
 func (c SocketController) setControllerName(cName string) {
 	c.ControllerName = cName
+}
+
+func (s SocketController) getBody() []byte {
+	return s.Body
+}
+
+func (s SocketController) ResolveBody(proto interface{})  {
+	body := s.getBody()
+	fmt.Println(string(body))
+	err := json.Unmarshal(body, proto)
+	if err != nil {
+		panic(err)
+	}
 }

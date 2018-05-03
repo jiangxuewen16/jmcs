@@ -2,6 +2,7 @@ package file
 
 import (
 	"jmcs/core/library/socket"
+	"jmcs/core/utils/file/transfer"
 )
 
 type FileTransController struct {
@@ -9,9 +10,7 @@ type FileTransController struct {
 }
 
 func (f FileTransController) MultiTrans()  {
-	body := f.Body
-
-
-
-	f.Write([]byte(body))
+	file := &transfer.FileClientTransfer{}
+	f.ResolveBody(file)
+	f.Write([]byte(file.MergeFileName))
 }

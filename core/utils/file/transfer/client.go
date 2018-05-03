@@ -9,18 +9,18 @@ import (
 	"time"
 )
 
-type FileTransfer struct {
-	Conn *net.Conn		//socket连接
+type FileClientTransfer struct {
+	conn *net.Conn `json:"conn"` //socket连接
 
-	label string		//master-主服务端(中心服务器)  slave-从服务器
+	label string `json:"label"` //master-主服务端(中心服务器)  slave-从服务器
 
-	FileName      string //待发送文件名称
-	MergeFileName string //待合并文件名称
-	Coroutine     int    //协程数量或拆分文件的数量
-	BufSize       int  //单次发送数据的大小
+	FileName      string `json:"file_name"`       //待发送文件名称
+	MergeFileName string `json:"merge_file_name"` //待合并文件名称
+	Coroutine     int    `json:"coroutine"`       //协程数量或拆分文件的数量
+	BufSize       int    `json:"buf_size"`        //单次发送数据的大小
 }
 
-func (f FileTransfer) TransferHandle() {
+func (f FileClientTransfer) TransferHandle() {
 
 	fl, err := os.OpenFile(f.FileName, os.O_RDWR, 0666) //读写打开
 	if err != nil {
@@ -87,11 +87,10 @@ func (f FileTransfer) TransferHandle() {
 *   begin           当前协程拆分待发送文件中的开始位置
 *   end             当前协程拆分待发送文件中的结束位置
  */
-func (f FileTransfer) splitFile(c chan string, coroutineNum int, begin int64, end int64) {
-	conn := *f.Conn
+func (f FileClientTransfer) splitFile(c chan string, coroutineNum int, begin int64, end int64) {
+	conn := *f.conn
 	size := f.BufSize
 	fileName := f.FileName
-
 
 	var by [1]byte
 	by[0] = byte(coroutineNum)
@@ -107,7 +106,7 @@ func (f FileTransfer) splitFile(c chan string, coroutineNum int, begin int64, en
 		os.Exit(0)
 	}
 
-	var msg = make([]byte, 1024)  //创建读取服务端信息的切片
+	var msg = make([]byte, 1024)   //创建读取服务端信息的切片
 	lengthh, err := conn.Read(msg) //确认服务器已收到顺序数据
 	if err != nil {
 		fmt.Printf("读取服务器数据错误.\n", lengthh)
@@ -186,8 +185,8 @@ func (f FileTransfer) splitFile(c chan string, coroutineNum int, begin int64, en
 *   mergeFileName   待合并的文件名
 *   coroutine       拆分文件的总个数
  */
-func (f FileTransfer) sendMergeCommand() {
-	conn := *f.Conn
+func (f FileClientTransfer) sendMergeCommand() {
+	conn := *f.conn
 	mergeFileName := f.MergeFileName
 	coroutine := f.Coroutine
 

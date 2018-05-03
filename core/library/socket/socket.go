@@ -8,6 +8,7 @@ import (
 	"net"
 	"fmt"
 	"errors"
+	"bytes"
 )
 
 type socket struct {
@@ -90,12 +91,11 @@ func handleTcp(conn *net.Conn) {
 	}()
 
 	for {
-		buf := make([]byte, 512)
+		buf := make([]byte, 1024 * 1024)
 		(*conn).Read(buf) //todo：读取数据，需要按约定处理
-
+		data := bytes.TrimRight(buf, "\x00")		//去掉所有末尾的空字节
 		head := Head{}
-		head.parse(buf)
-
+		head.parse(data)
 		Handle(conn, head)
 	}
 }
