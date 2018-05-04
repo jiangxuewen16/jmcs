@@ -1,7 +1,6 @@
 package transfer
 
 import (
-	"bytes"
 	"fmt"
 	"net"
 	"os"
@@ -17,31 +16,37 @@ func init() {
 
 type ServerTransfer struct {
 	SendPackage
-	res          string
-	by []byte
-
+	receiveNum int      //接收包的数量
+	conn       net.Conn //tcp连接通道
+	filePath   string   //文件 + 路径
 }
 
-var receiveNum map[string]int //接收文件的接收数量
+var receiveNum map[string]int //每个传输文件的信息
+
+func (s *ServerTransfer) setFilePath(path string)  {
+	s.filePath = path
+}
 
 /*
 *   文件接收方法
 *
 *   con 连接成功的客户端连接
  */
-func (s ServerTransfer) ReceiveFile(con net.Conn) {
-
+func (s ServerTransfer) ReceiveFile() {
 	var (
 		//data    = make([]byte, 1024*1024) //用于保存接收的数据的切片
 		//by      []byte
 		//databuf = bytes.NewBuffer(by) //数据缓冲变量
 		position = s.Position
-		token = s.Token
+		token    = s.Token
+		//tempDir = library.Config  //todo:项目临时文件夹
+		tempDir = "/temp/jmcs/"
 	)
 
-	_,ok := receiveNum[s.Token]
+	_, ok := receiveNum[token]
 	if !ok {
-		tempFileName := token + strconv.Itoa(position)		//	临时文件名
+		tempFileName := token + "-" + strconv.Itoa(position) //	临时文件名
+		filePath :=
 		fmt.Println("创建临时文件：", tempFileName)
 		fout, err := os.Create(tempFileName)
 		if err != nil {
@@ -58,8 +63,7 @@ func (s ServerTransfer) ReceiveFile(con net.Conn) {
 
 	receiveNum[s.Token] = 1
 
-
-	fmt.Println("开始接受文件：【" + s.FileName +"】")
+	fmt.Println("开始接受文件：【" + s.FileName + "】")
 	j := 0 //标记接收数据的次数
 	for {
 		length, err := con.Read(data)
@@ -101,6 +105,36 @@ func (s ServerTransfer) ReceiveFile(con net.Conn) {
 		j++
 	}
 
+}
+
+func (s ServerTransfer) buildFileInfo()  {
+	if _,ok := receiveNum[s.Token]; ok {
+		return
+	}
+	receiveNum[s.Token] = s
+}
+
+func (s ServerTransfer) createTempFile() bool {
+	tempFileName := s.Token + strconv.Itoa() //	临时文件名
+	fmt.Println("创建临时文件：", tempFileName)
+	fout, err := os.Create(tempFileName)
+	if err != nil {
+		fmt.Println("创建临时文件错误", tempFileName)
+		return
+	}
+	fout.Close()
+
+	receiveNum[s.Token] = 1
+}
+
+func (s ServerTransfer) createDir() bool {
+	dir := s.RootPath + "/" + s.Path + "/" + s.FileName
+	//todo:权限？？？？
+	if err := os.MkdirAll(dir, 0777); err != nil {
+		return false
+	}
+	s.setFilePath(dir)
+	return true
 }
 
 /*

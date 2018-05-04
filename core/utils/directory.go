@@ -62,15 +62,13 @@ func GetPathFilePath(dir string, suffixs []string) []string {
 	return filePaths
 }
 
-func MktempDir(dir, prefix string) (string, error) {
-	if ok, err := PathExists(dir); !ok || err != nil {
-		os.MkdirAll(dir, 0777) //todo:权限？？？？
+func MkTempDir(dir string) (string, error) {
+	tempDir := os.TempDir() + "/" + dir
+	if ok, err := PathExists(tempDir); !ok || err != nil {
+		//err := os.MkdirAll(dir, 0777)  todo:权限？？？？
+		if err := os.MkdirAll(tempDir, 0777); err != nil {
+			return "",err
+		}
 	}
-
-	path, err := ioutil.TempDir(dir, prefix)
-	if err != nil {
-		return "", err
-	}
-
-	return path, err
+	return tempDir, nil
 }

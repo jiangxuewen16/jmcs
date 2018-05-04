@@ -9,12 +9,12 @@ import (
 
 //sph  -> socket protocol head
 type Head struct {
-	Protocol string `json:"Protocol"`		//协议
-	RequstRouter string `json:"Requst-router"`		//访问路由
-	StatusCode int `json:"Status-code"`		 //传输状态码
-	ContentType common.ContentType `json:"Content-type"`
-	Authentication string `json:"Authentication"`	//对于socket来说没实际意义
-	Body []byte `json:"Body"`		//请求body,用于存放具体传输数据
+	Protocol       string             `json:"Protocol"`      //协议
+	RequstRouter   string             `json:"Requst-router"` //访问路由
+	StatusCode     int                `json:"Status-code"`   //传输状态码
+	ContentType    common.ContentType `json:"Content-type"`
+	Authentication string             `json:"Authentication"` //对于socket来说没实际意义
+	Body           []byte             `json:"Body"`           //请求body,用于存放具体传输数据
 
 	// userAgent []string `json:"User-agent"`
 	// accept []common.ContentType `json:"accept"`
@@ -32,7 +32,6 @@ func (h *Head) parse(b []byte) {
 		keyAndValue := strings.SplitN(headStr,":",2)
 		h.setData(keyAndValue[1], i)
 	}
-
 }
 
 func (h *Head) setData(value string, i int) {

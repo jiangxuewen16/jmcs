@@ -7,28 +7,52 @@ import (
 	_ "jmcs/app/routers/socket" //初始化socket路由 todo:这里初始化路由
 	"os"
 	"fmt"
+	"github.com/astaxie/beego/config"
 )
 
 const (
 	CONFIG_PATH = "D:/golang/src/jmcs/config"
+	CONF_NAME = "app" //配置名称
 )
+
+var AppConfig config.Config
 
 func init() {
 	ok, err := utils.PathExists(CONFIG_PATH)
-		if !ok {
-			fmt.Println("目录不存在")
-			os.Exit(0)
-		}
-		if err != nil {
-			utils.CheckErr(err)
-		}
+	if !ok {
+		fmt.Println("配置目录不存在")
+		os.Exit(0)
+	}
+	if err != nil {
+		utils.CheckErr(err)
+	}
 
 	//初始化所有(总)配置
 	filePaths := utils.GetPathFilePath(CONFIG_PATH, utils.Suffix)
 	for _, filePath := range filePaths {
-		config := utils.Config{}
-		config.Resolve(filePath)
+		conf := utils.Config{}
+		conf.Resolve(filePath)
 	}
+
+	AppConfig, ok := utils.Configs[CONF_NAME]
+	if !ok {
+		fmt.Println("app.yml 配置不存在，请配置该文件")
+		os.Exit(0)
+	}
+
+	/*创建项目临时文件夹*/
+	var tempDirName string
+	if appName, ok := AppConfig["name"]; ok {
+		tempDirName = appName.(string)
+	} else {
+		tempDirName = "jmcs"
+	}
+	appTempDir,err := utils.MkTempDir(tempDirName)
+	if err != nil {
+		fmt.Println("创建项目临时文件失败")
+		os.Exit(0)
+	}
+	AppConfig["temDir"] = appTempDir
 }
 
 func Run() {
