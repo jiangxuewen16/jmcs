@@ -34,7 +34,8 @@ type ReceivePackage struct {
 	FilePath  string //文件所在的路径 + 文件名  ，用于传输失败补传
 	Token     string //文件标记（用于标记每个文件，最后合并按此标记来）-> 用uuid
 	Position  int    //文件数据包在文件所在的位置
-	isSuccess bool   //是否发送成功
+	Message   string //失败信息
+	isSuccess bool //是否发送成功
 }
 
 /*const (

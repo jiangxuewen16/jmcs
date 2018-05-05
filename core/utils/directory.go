@@ -72,3 +72,8 @@ func MkTempDir(dir string) (string, error) {
 	}
 	return tempDir, nil
 }
+
+func MkDirAll(path string) error {
+	err := os.MkdirAll(path, 0777)
+	return err
+}

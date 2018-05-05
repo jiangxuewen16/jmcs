@@ -1,5 +1,7 @@
 package common
 
+type SocketStatus int
+
 const (
 
 	STATUS_ERROR = 100

@@ -9,12 +9,12 @@ import (
 
 //sph  -> socket protocol head
 type Head struct {
-	Protocol       string             `json:"Protocol"`      //协议
-	RequstRouter   string             `json:"Requst-router"` //访问路由
-	StatusCode     int                `json:"Status-code"`   //传输状态码
-	ContentType    common.ContentType `json:"Content-type"`
-	Authentication string             `json:"Authentication"` //对于socket来说没实际意义
-	Body           []byte             `json:"Body"`           //请求body,用于存放具体传输数据
+	Protocol       string              `json:"Protocol"`      //协议
+	RequstRouter   string              `json:"Requst-router"` //访问路由
+	StatusCode     common.SocketStatus `json:"Status-code"`   //传输状态码
+	ContentType    common.ContentType  `json:"Content-type"`
+	Authentication string              `json:"Authentication"` //对于socket来说没实际意义
+	Body           []byte              `json:"Body"`           //请求body,用于存放具体传输数据
 
 	// userAgent []string `json:"User-agent"`
 	// accept []common.ContentType `json:"accept"`
@@ -24,12 +24,12 @@ type Head struct {
 func (h *Head) parse(b []byte) {
 	s := string(b)
 	headStrs := strings.Split(s, "\r\n\r\n")
-	for i,headStr := range headStrs {
-		if i == 0 {		//第一行数据是协议
+	for i, headStr := range headStrs {
+		if i == 0 { //第一行数据是协议
 			h.Protocol = headStr
 			continue
 		}
-		keyAndValue := strings.SplitN(headStr,":",2)
+		keyAndValue := strings.SplitN(headStr, ":", 2)
 		h.setData(keyAndValue[1], i)
 	}
 }
@@ -43,7 +43,7 @@ func (h *Head) setData(value string, i int) {
 		case reflect.String:
 			elem.SetString(value)
 		case reflect.Int:
-			if v,err := strconv.Atoi(value); err == nil {
+			if v, err := strconv.Atoi(value); err == nil {
 				elem.SetInt(int64(v))
 			}
 		case reflect.Slice:
