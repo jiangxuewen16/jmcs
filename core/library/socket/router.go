@@ -46,14 +46,14 @@ func Handle(conn net.Conn, h Head) {
 	handler := *HandleFunc.controllerRouter
 	handler.Init(conn, h)
 
-	reflectVal := reflect.ValueOf(handler)
+	/*reflectVal := reflect.ValueOf(handler)
 	if val := reflectVal.MethodByName(HandleFunc.method); val.IsValid() {
 		val.Call(nil)
 	} else {
 		panic("method doesn't exist in the controller " + HandleFunc.method)
-	}
+	}*/
 
-	//Mapper(handler, HandleFunc.method)
+	Mapper(handler, HandleFunc.method)
 }
 
 /*运行router 的 controller的方法*/

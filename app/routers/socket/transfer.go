@@ -7,5 +7,7 @@ import (
 
 func init()  {
 
-	socket.Add("/file/transfer", &file.FileTransController{}, "MultiTrans")
+	socket.Add("/file/receive", &file.FileTransController{}, "Receive")		//文件接收
+
+	socket.Add("/file/send", &file.FileTransController{}, "Send")		//文件发送
 }

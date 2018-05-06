@@ -4,19 +4,55 @@ import (
 	"jmcs/core/library/socket"
 	"jmcs/core/utils/file/transfer"
 	"github.com/gin-gonic/gin/json"
+	"jmcs/core/utils"
+	"jmcs/core/utils/strings"
 )
 
 type FileTransController struct {
 	socket.SocketController
 }
 
-func (f FileTransController) MultiTrans()  {
+func (f FileTransController) Receive() {
 	serverTransfer := &transfer.ServerTransfer{}
 	f.ResolveBody(serverTransfer)
 
-	//serverTransfer := transfer.ServerTransfer{}
-	receivePackage := serverTransfer.ReceiveFile()
-	s, _ := json.Marshal(receivePackage)
-	//fmt.Println(serverTransfer)
-	f.Write([]byte(s))
+	receivePackage := serverTransfer.ReceiveFile()		//接收文件
+	receiveByte, _ := json.Marshal(receivePackage)
+
+	f.Responser(receiveByte, "/file/receive", "")
+
+	//if serverTransfer.Finished {		//文件传输完成 todo:发送方断开???
+	//	f.Close()
+	//}
+}
+
+func (f FileTransController) Send() {
+	filePath := "C:/temp/new"
+	rootPath := "C:/temp/root"
+	conn := f.Conn
+
+	fileInfos, err := utils.GetFileList(filePath, 0)
+
+	if err != nil {
+
+	}
+
+	for _, fileInfo := range fileInfos {
+		sp := transfer.SendPackage{
+			Size:          1024 * 1024,
+			FileName:      fileInfo.Name(),
+			Path:          "",
+			RootPath:      rootPath,
+			MergeFileName: fileInfo.Name(),
+			Token:         strings.Rand().Hex(),
+			Coroutine:     10,
+			BufSize:       1024 * 1024,
+			//Position:i,
+			//Data:          []byte("1234567890\r\n"),
+		}
+
+		sp.Handle(conn)
+	}
+
+	f.Close()		//文件传输完成,断开连接
 }

@@ -2,33 +2,62 @@ package transfer
 
 import (
 	"os"
-	"runtime"
 	"strconv"
 	"jmcs/core/utils"
-	"fmt"
 )
-
-//todo:接收数据的时候统计文件接收了多少个包
-
-func init() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-}
 
 type ServerTransfer struct {
 	SendPackage
 	receiveNum int //接收包的数量
+	Finished bool	//判断传输是否完成
 }
 
 const READ_BUFF = 1024 * 1024
 
-
 var fileReceiveInfos = make(map[string]*ServerTransfer) //每个传输文件的信息
 
-var tempPath = "C:/Users/jiang/AppData/Local/Temp/jmcs-001" //todo:项目临时文件夹
+/*
+ *   文件接收方法主程序
+ */
+func (s *ServerTransfer) ReceiveFile() ReceivePackage {
+	s.Finished = false
 
+	token := s.Token
 
+	err := s.createTempFile() //创建临时文件
+	if err != nil {
+		return s.receiveData(err)
+	}
+
+	fileReceiveInfo, ok := fileReceiveInfos[token]
+	if !ok {
+		s.receiveNum = 1
+		fileReceiveInfos[token] = s
+	} else {
+		fileReceiveInfo.receiveNum ++
+
+		/*判断文件包是否发送完成，发送完成则合并文件*/
+		if fileReceiveInfo.receiveNum >= s.Coroutine {
+			dir, err := s.createFilePath()
+			if err != nil { //创建最终文件存放的文件夹
+				return s.receiveData(err)
+			}
+			err = s.mainMergeFile(dir)
+			if err != nil {
+				return s.receiveData(err)
+			}
+
+			s.Finished = true
+		}
+	}
+
+	return s.receiveData(nil)
+}
+
+/*获取存放的临时路径*/
 func (s *ServerTransfer) getTempFilePath(position int) string {
-	return tempPath + "/" + s.Token + "-" + strconv.Itoa(position)
+	tempPath := utils.AppConfig["temDir"]
+	return tempPath.(string) + "/" + s.Token + "-" + strconv.Itoa(position)
 }
 
 /*创建最终文件存放目录*/
@@ -42,54 +71,16 @@ func (s *ServerTransfer) createFilePath() (string, error) {
 	return filePath, nil
 }
 
-/*
-*   文件接收方法
-*
-*   con 连接成功的客户端连接
- */
-func (s ServerTransfer) ReceiveFile() ReceivePackage {
+/*构建文件接收信息：成功或者失败*/
+func (s ServerTransfer) receiveData(err error) ReceivePackage {
+	rBool := true
+	message := ""
 
-	token := s.Token
-
-	err := s.createTempFile() //创建临时文件
 	if err != nil {
-		return s.receiveFileFail(err)
+		rBool = false
+		message = err.Error()
 	}
-
-	fileReceiveInfo, ok := fileReceiveInfos[token]
-	if !ok {
-		s.receiveNum = 1
-		fileReceiveInfos[token] = &s
-	} else {
-		fileReceiveInfo.receiveNum ++
-
-		//receiveNum[token].receiveNum = num + 1
-		/*判断文件包是否发送完成，发送完成则合并文件*/
-		fmt.Println(fileReceiveInfo.receiveNum)
-		if fileReceiveInfo.receiveNum >= s.Coroutine {
-			dir, err := s.createFilePath()
-			if err != nil { //创建最终文件存放的文件夹
-				return s.receiveFileFail(err)
-			}
-			err = s.mainMergeFile(dir)
-			if err != nil {
-				return s.receiveFileFail(err)
-			}
-		}
-	}
-
-	return s.receiveFileSuccess()
-}
-
-/*发送失败*/
-func (s ServerTransfer) receiveFileFail(err error) ReceivePackage {
-	receivePackage := ReceivePackage{FilePath:s.Path + s.FileName, Token: s.Token, Position:s.Position, Message:err.Error(),isSuccess:false}
-	return receivePackage
-}
-
-/*发送成功*/
-func (s ServerTransfer) receiveFileSuccess() ReceivePackage {
-	receivePackage := ReceivePackage{FilePath:s.Path + s.FileName, Token: s.Token, Position:s.Position, Message:"",isSuccess:true}
+	receivePackage := ReceivePackage{FilePath:s.Path + s.FileName, Token: s.Token, Position:s.Position, Message:message,isSuccess:rBool}
 	return receivePackage
 }
 
@@ -113,10 +104,7 @@ func (s ServerTransfer) createTempFile() error {
 }
 
 /*
-*   根据临时文件数量及有效文件名称生成文件合并规则进行文件合并
-*
-*   connumber   临时文件数量
-*   filename    有效文件名称
+ *   根据临时文件数量及有效文件名称生成文件合并规则进行文件合并
  */
 func (s ServerTransfer) mainMergeFile(path string) error {
 	mergeFileName := s.MergeFileName
@@ -131,7 +119,7 @@ func (s ServerTransfer) mainMergeFile(path string) error {
 	defer file.Close()
 
 	//依次对临时文件进行合并
-	for i := 1; i <= coroutine; i++ {
+	for i := 0; i < coroutine; i++ {
 		tempFilePath := s.getTempFilePath(i)
 		err := mergeFile(tempFilePath, file)
 		if err != nil {
@@ -142,10 +130,6 @@ func (s ServerTransfer) mainMergeFile(path string) error {
 
 	delete(fileReceiveInfos, token)
 
-	//删除生成的临时文件
-	/*for i := 0; i < coroutine; i++ {
-		os.Remove(tempFilePath)
-	}*/
 	return nil
 }
 

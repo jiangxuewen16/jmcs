@@ -19,16 +19,6 @@ type SendPackage struct {
 	Data          []byte //文件数据
 }
 
-/*文件内容发送包*/
-/*
-type FilePackage struct {
-	Type     int8   //类型 1-文件（文件信息），2-文件夹，4-文件拆分包
-	Token    string //文件标记（用于标记每个文件，最后合并按此标记来）-> 用uuid
-	Position int    //文件数据包在文件所在的位置
-	Data     []byte //文件数据
-}
-*/
-
 /*socket 服务端在文件包发送成功后确认包*/
 type ReceivePackage struct {
 	FilePath  string //文件所在的路径 + 文件名  ，用于传输失败补传

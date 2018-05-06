@@ -62,6 +62,7 @@ func GetPathFilePath(dir string, suffixs []string) []string {
 	return filePaths
 }
 
+/*创建临时文件*/
 func MkTempDir(dir string) (string, error) {
 	tempDir := os.TempDir() + "/" + dir
 	if ok, err := PathExists(tempDir); !ok || err != nil {
@@ -73,7 +74,32 @@ func MkTempDir(dir string) (string, error) {
 	return tempDir, nil
 }
 
+/*创建文件夹*/
 func MkDirAll(path string) error {
 	err := os.MkdirAll(path, 0777)
 	return err
 }
+
+/*获取文件夹下所有文件*/
+func GetFileList(dir string, level int) ([]os.FileInfo, error) {
+	var fileList []os.FileInfo
+
+	files,err := ioutil.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	for _,file := range files {
+		if file.IsDir() {
+			files, err := GetFileList(dir + "/" + file.Name(), level - 1)
+			if err != nil {
+				return nil,err
+			}
+			fileList = append(fileList, files...)
+		} else {
+			fileList = append(fileList, file)
+		}
+	}
+	return fileList,nil
+}
+

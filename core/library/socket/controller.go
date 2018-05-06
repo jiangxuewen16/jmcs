@@ -29,28 +29,28 @@ type SocketControllerInterface interface {
 
 /*初始化*/
 func (s *SocketController) Init(conn net.Conn, h Head) {
+	s.checkAuthentication()
 	s.BaseUrl = h.RequstRouter
 	s.Body = h.Body
 
 	s.Conn = conn
 	s.Head = h
+
+
+}
+
+func (s SocketController) checkAuthentication() bool{
+	//s.Head.Authentication
+	return true
+}
+
+func (s SocketController) Close(){
+	(s.Conn).Close()
 }
 
 /*向socket通道写入数据*/
 func (s SocketController) Write(b []byte) {
 	(s.Conn).Write(b)
-}
-
-func (s SocketController) setBashUrl(url string) {
-	s.BaseUrl = url
-}
-
-func (s SocketController) setActionName(actionName string) {
-	s.ActionName = actionName
-}
-
-func (s SocketController) setControllerName(cName string) {
-	s.ControllerName = cName
 }
 
 /*获取body信息*/
@@ -83,6 +83,7 @@ func (s SocketController) buildHead(router string, status int) bytes.Buffer {
 	buf.WriteString("\r\n\r\n")
 	buf.WriteString("Authentication:")
 	buf.WriteString("")
+	buf.WriteString("\r\n\r\n")
 	buf.WriteString("body:")
 	return buf
 }
