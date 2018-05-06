@@ -34,7 +34,7 @@ func checkPattern(pattern string) {
 }
 
 /*处理路由*/
-func Handle(conn *net.Conn, h Head) {
+func Handle(conn net.Conn, h Head) {
 	if len(h.RequstRouter) <= 0 {
 		panic("没有自定路由") //todo:404
 	}

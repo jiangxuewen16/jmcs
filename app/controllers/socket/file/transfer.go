@@ -3,7 +3,7 @@ package file
 import (
 	"jmcs/core/library/socket"
 	"jmcs/core/utils/file/transfer"
-	"fmt"
+	"github.com/gin-gonic/gin/json"
 )
 
 type FileTransController struct {
@@ -11,11 +11,12 @@ type FileTransController struct {
 }
 
 func (f FileTransController) MultiTrans()  {
-	file := &transfer.SendPackage{}
-	f.ResolveBody(file)
+	serverTransfer := &transfer.ServerTransfer{}
+	f.ResolveBody(serverTransfer)
 
-	serverTransfer := transfer.ServerTransfer{}
-	serverTransfer.ReceiveFile()
-	fmt.Println(file)
-	f.Write([]byte("aaaa"))
+	//serverTransfer := transfer.ServerTransfer{}
+	receivePackage := serverTransfer.ReceiveFile()
+	s, _ := json.Marshal(receivePackage)
+	//fmt.Println(serverTransfer)
+	f.Write([]byte(s))
 }

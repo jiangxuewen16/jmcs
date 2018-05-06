@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"bytes"
+	"net/http"
+	"jmcs/core/common"
 )
 
 type SocketController struct {
@@ -14,44 +16,41 @@ type SocketController struct {
 	methodMapping  map[string]func()
 	Body           []byte
 
-	Head Head
-	Conn *net.Conn
-
+	Head                Head
+	Conn                net.Conn
+	ResponseContentType common.ContentType
 	//todo:socket业务相关的属性
 }
 
 type SocketControllerInterface interface {
-	Init(conn *net.Conn, h Head)
+	Init(conn net.Conn, h Head)
 	Write(b []byte)
 }
 
-func (sc *SocketController) Init(conn *net.Conn, h Head) {
-	sc.BaseUrl = h.RequstRouter
-	sc.Body = h.Body
+/*初始化*/
+func (s *SocketController) Init(conn net.Conn, h Head) {
+	s.BaseUrl = h.RequstRouter
+	s.Body = h.Body
 
-	sc.Conn = conn
-	sc.Head = h
-}
-
-func (sc SocketController) Handle() {
-
+	s.Conn = conn
+	s.Head = h
 }
 
 /*向socket通道写入数据*/
-func (sc SocketController) Write(b []byte) {
-	(*sc.Conn).Write(b)
+func (s SocketController) Write(b []byte) {
+	(s.Conn).Write(b)
 }
 
-func (c SocketController) setBashUrl(url string) {
-	c.BaseUrl = url
+func (s SocketController) setBashUrl(url string) {
+	s.BaseUrl = url
 }
 
-func (c SocketController) setActionName(actionName string) {
-	c.ActionName = actionName
+func (s SocketController) setActionName(actionName string) {
+	s.ActionName = actionName
 }
 
-func (c SocketController) setControllerName(cName string) {
-	c.ControllerName = cName
+func (s SocketController) setControllerName(cName string) {
+	s.ControllerName = cName
 }
 
 /*获取body信息*/
@@ -69,7 +68,7 @@ func (s SocketController) ResolveBody(proto interface{}) {
 	}
 }
 
-func (s SocketController) buildHead(router string) bytes.Buffer {
+func (s SocketController) buildHead(router string, status int) bytes.Buffer {
 	var buf bytes.Buffer
 	buf.WriteString("HEAD / SOCKET/1.0")
 	buf.WriteString("\r\n\r\n")
@@ -88,14 +87,24 @@ func (s SocketController) buildHead(router string) bytes.Buffer {
 	return buf
 }
 
-/*构造返回*/
+/*返回*/
 func (s SocketController) Responser(data interface{}, router string, message string) {
-	buf := s.buildHead(router)
-	body := s.buildBody(&data)
-	//buf.WriteString()
+	status := http.StatusOK
+
+	body, err := s.buildBody(&data)
+	if err != nil {
+		status = http.StatusInternalServerError //服务端错误
+	}
+	buf := s.buildHead(router, status)
+	buf.Write(body)
 	s.Write(buf.Bytes())
 }
 
-func (s SocketController) buildBody(data interface{}) {
-
+func (s SocketController) buildBody(data interface{}) ([]byte, error) {
+	//todo:返回类型，不仅仅是json
+	b, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
 }

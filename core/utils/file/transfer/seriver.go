@@ -5,6 +5,7 @@ import (
 	"runtime"
 	"strconv"
 	"jmcs/core/utils"
+	"fmt"
 )
 
 //todo:接收数据的时候统计文件接收了多少个包
@@ -16,17 +17,15 @@ func init() {
 type ServerTransfer struct {
 	SendPackage
 	receiveNum int //接收包的数量
-	//conn       net.Conn //tcp连接通道
-	//filePath   string   //文件 + 路径
 }
 
-var fileReceiveInfos map[string]ServerTransfer //每个传输文件的信息
+const READ_BUFF = 1024 * 1024
 
-var tempPath = "" //todo:项目临时文件夹
 
-/*func (s *ServerTransfer) setFilePath(path string) {
-	s.filePath = path
-}*/
+var fileReceiveInfos = make(map[string]*ServerTransfer) //每个传输文件的信息
+
+var tempPath = "C:/Users/jiang/AppData/Local/Temp/jmcs-001" //todo:项目临时文件夹
+
 
 func (s *ServerTransfer) getTempFilePath(position int) string {
 	return tempPath + "/" + s.Token + "-" + strconv.Itoa(position)
@@ -60,12 +59,13 @@ func (s ServerTransfer) ReceiveFile() ReceivePackage {
 	fileReceiveInfo, ok := fileReceiveInfos[token]
 	if !ok {
 		s.receiveNum = 1
-		fileReceiveInfos[token] = s
+		fileReceiveInfos[token] = &s
 	} else {
 		fileReceiveInfo.receiveNum ++
 
 		//receiveNum[token].receiveNum = num + 1
-		/*判断文件包是否放松完成，发送完成则合并文件*/
+		/*判断文件包是否发送完成，发送完成则合并文件*/
+		fmt.Println(fileReceiveInfo.receiveNum)
 		if fileReceiveInfo.receiveNum >= s.Coroutine {
 			dir, err := s.createFilePath()
 			if err != nil { //创建最终文件存放的文件夹
@@ -121,6 +121,7 @@ func (s ServerTransfer) createTempFile() error {
 func (s ServerTransfer) mainMergeFile(path string) error {
 	mergeFileName := s.MergeFileName
 	coroutine := s.Coroutine
+	token := s.Token
 	filePath := path + "/" + mergeFileName
 	file, err := os.Create(filePath)
 	if err != nil {
@@ -130,7 +131,7 @@ func (s ServerTransfer) mainMergeFile(path string) error {
 	defer file.Close()
 
 	//依次对临时文件进行合并
-	for i := 0; i < coroutine; i++ {
+	for i := 1; i <= coroutine; i++ {
 		tempFilePath := s.getTempFilePath(i)
 		err := mergeFile(tempFilePath, file)
 		if err != nil {
@@ -138,6 +139,8 @@ func (s ServerTransfer) mainMergeFile(path string) error {
 		}
 		os.Remove(tempFilePath)
 	}
+
+	delete(fileReceiveInfos, token)
 
 	//删除生成的临时文件
 	/*for i := 0; i < coroutine; i++ {
@@ -169,7 +172,7 @@ func mergeFile(rfilename string, wfile *os.File) error {
 
 	num := stat.Size()
 
-	buf := make([]byte, 1024*1024)
+	buf := make([]byte, READ_BUFF)
 	for i := 0; int64(i) < num; {
 		length, err := rfile.Read(buf)
 		if err != nil {

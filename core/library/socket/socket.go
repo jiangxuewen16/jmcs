@@ -70,7 +70,7 @@ func start()  {
 			continue
 		}
 
-		go handleTcp(&conn)
+		go handleTcp(conn)
 	}
 }
 
@@ -83,7 +83,7 @@ func listenAddr(tcpAddr *net.TCPAddr) *net.TCPListener {
 }
 
 /*socket业务具体处理 todo:这里调用路由合不合理*/
-func handleTcp(conn *net.Conn) {
+func handleTcp(conn net.Conn) {
 	defer func(){
 		if err := recover(); err != nil {
 			fmt.Println(":::::" , err, ":::::")
@@ -92,7 +92,7 @@ func handleTcp(conn *net.Conn) {
 
 	for {
 		buf := make([]byte, 1024 * 1024)
-		(*conn).Read(buf) //todo：读取数据，需要按约定处理
+		conn.Read(buf) //todo：读取数据，需要按约定处理
 		data := bytes.TrimRight(buf, "\x00")		//去掉所有末尾的空字节
 		head := Head{}
 		head.parse(data)
