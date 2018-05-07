@@ -3,6 +3,7 @@ package transfer
 import (
 	"jmcs/core/utils/strings"
 	"net"
+	"math"
 )
 
 /* socket 文件发送包*/
@@ -31,7 +32,16 @@ type ReceivePackage struct {
 
 func (c SendPackage) Handle(conn net.Conn) {
 	clientTransfer := ClientTransfer{c, conn}
+	c.calculate()		//计算些发送数据
+	c.SetToken()	    //file token
 	clientTransfer.SendFile()
+}
+
+func (c SendPackage) calculate(){
+	if c.BufSize > 0 {
+		f := float64(c.Size)/float64(c.BufSize)
+		c.Coroutine = int(math.Ceil(f))
+	}
 }
 
 /*const (

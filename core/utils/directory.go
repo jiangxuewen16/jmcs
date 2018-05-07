@@ -4,7 +4,8 @@ import (
 	"os"
 	"io/ioutil"
 	"path"
-	"time"
+	"path/filepath"
+	"strings"
 )
 
 /*判断文件是否存在*/
@@ -77,8 +78,19 @@ func MkTempDir(dir string) (string, error) {
 
 /*创建文件夹*/
 func MkDirAll(path string) error {
-	err := os.MkdirAll(path, 0777)
+	err := os.MkdirAll(path, 0777) //todo:0777的权限
 	return err
+}
+
+/*
+获取程序运行路径
+*/
+func getCurrentDirectory() (string,error) {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		return "",err
+	}
+	return strings.Replace(dir, "\\", "/", -1),nil
 }
 
 

@@ -61,17 +61,11 @@ func (c ClientTransfer) SendFile() {
 		fmt.Println(<-ch)
 	}
 
-	midtime := time.Now().Unix()
-	sendtime := midtime - begintime
+	endTime := time.Now().Unix()
+	sendtime := endTime - begintime
 	fmt.Printf("发送耗时：%d 分 %d 秒 \n", sendtime/60, sendtime%60)
 
-	//c.sendMergeCommand() //发送文件合并指令及文件名
-	endtime := time.Now().Unix()
-
-	mergetime := endtime - midtime
-	fmt.Printf("合并耗时：%d 分 %d 秒 \n", mergetime/60, mergetime%60)
-
-	tot := endtime - begintime
+	tot := endTime - begintime
 	fmt.Printf("总计耗时：%d 分 %d 秒 \n", tot/60, tot%60)
 
 }

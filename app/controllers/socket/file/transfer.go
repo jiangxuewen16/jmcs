@@ -4,7 +4,6 @@ import (
 	"jmcs/core/library/socket"
 	"jmcs/core/utils/file/transfer"
 	"github.com/gin-gonic/gin/json"
-	"jmcs/core/utils/strings"
 	"jmcs/core/utils/file"
 )
 
@@ -16,7 +15,7 @@ func (f FileTransController) Receive() {
 	serverTransfer := &transfer.ServerTransfer{}
 	f.ResolveBody(serverTransfer)
 
-	receivePackage := serverTransfer.ReceiveFile()		//接收文件
+	receivePackage := serverTransfer.ReceiveFile() //接收文件
 	receiveByte, _ := json.Marshal(receivePackage)
 
 	f.Responser(receiveByte, "/file/receive", "")
@@ -39,13 +38,13 @@ func (f FileTransController) Send() {
 
 	for _, fileInfo := range fileInfos {
 		sp := transfer.SendPackage{
-			Size:          1024 * 1024,
+			Size:          fileInfo.Size,
 			FileName:      fileInfo.Name,
-			Path:          "",
+			Path:          fileInfo.Path,
 			RootPath:      rootPath,
 			MergeFileName: fileInfo.Name,
-			Token:         strings.Rand().Hex(),		//UUID
-			Coroutine:     10,
+			//Token:         strings.Rand().Hex(), //UUID
+			//Coroutine:     10,		//这个可以通过 size/bufsize 计算的出来
 			BufSize:       1024 * 1024,
 			//Position:i,
 			//Data:          []byte("1234567890\r\n"),
@@ -54,5 +53,5 @@ func (f FileTransController) Send() {
 		sp.Handle(conn)
 	}
 
-	f.Close()		//文件传输完成,断开连接
+	f.Close() //文件传输完成,断开连接
 }

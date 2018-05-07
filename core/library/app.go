@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	CONFIG_PATH = "C:/golang/src/jmcs/config"			//todo:这里一定要用户输入
+
+	CONFIG_PATH = "D:/golang/src/jmcs/config"			//todo:这里一定要用户输入
 	CONF_NAME = "app" //配置名称
 )
 
