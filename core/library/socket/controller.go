@@ -35,8 +35,6 @@ func (s *SocketController) Init(conn net.Conn, h Head) {
 
 	s.Conn = conn
 	s.Head = h
-
-
 }
 
 func (s SocketController) checkAuthentication() bool{

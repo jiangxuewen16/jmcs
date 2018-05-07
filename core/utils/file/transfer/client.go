@@ -15,11 +15,6 @@ type ClientTransfer struct {
 	Conn net.Conn
 }
 
-func (c SendPackage) Handle(conn net.Conn) {
-	clientTransfer := ClientTransfer{c, conn}
-	clientTransfer.SendFile()
-}
-
 func (c ClientTransfer) SendFile() {
 	var (
 		coroutine = c.Coroutine
@@ -96,29 +91,6 @@ func (c *ClientTransfer) splitFile(ch chan string, coroutineNum int, begin int64
 		fileName = c.FileName
 		readMsg      = make([]byte, 1024) //创建读取服务端信息的切片
 	)
-
-	//var by [1]byte
-	//by[0] = byte(coroutineNum)
-	//var bys []byte
-	//databuf := bytes.NewBuffer(bys) //数据缓冲变量
-	//databuf.Write(by[:])
-	//databuf.WriteString(mergeFileName)
-	//bb := databuf.Bytes()
-
-	/*in, err := conn.Write(bb) //向服务器发送当前协程的顺序，代表拆分文件的顺序
-	if err != nil {
-		fmt.Printf("向服务器发送数据错误: %d\n", in)
-		os.Exit(0)
-	}*/
-
-	/*var msg = make([]byte, 1024)   //创建读取服务端信息的切片
-	lengthh, err := conn.Read(msg) //确认服务器已收到顺序数据
-	if err != nil {
-		fmt.Printf("读取服务器数据错误.\n", lengthh)
-		os.Exit(0)
-	}*/
-	// str := string(msg[0:lengthh])
-	// fmt.Println("服务端信息：",str)
 
 	//打开待发送文件，准备发送文件数据
 	file, err := os.OpenFile(fileName, os.O_RDWR, 0666)

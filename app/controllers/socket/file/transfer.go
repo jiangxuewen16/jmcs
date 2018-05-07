@@ -4,8 +4,8 @@ import (
 	"jmcs/core/library/socket"
 	"jmcs/core/utils/file/transfer"
 	"github.com/gin-gonic/gin/json"
-	"jmcs/core/utils"
 	"jmcs/core/utils/strings"
+	"jmcs/core/utils/file"
 )
 
 type FileTransController struct {
@@ -31,7 +31,7 @@ func (f FileTransController) Send() {
 	rootPath := "C:/temp/root"
 	conn := f.Conn
 
-	fileInfos, err := utils.GetFileList(filePath, 0)
+	fileInfos, err := file.GetFileList(filePath, 0)
 
 	if err != nil {
 
@@ -40,11 +40,11 @@ func (f FileTransController) Send() {
 	for _, fileInfo := range fileInfos {
 		sp := transfer.SendPackage{
 			Size:          1024 * 1024,
-			FileName:      fileInfo.Name(),
+			FileName:      fileInfo.Name,
 			Path:          "",
 			RootPath:      rootPath,
-			MergeFileName: fileInfo.Name(),
-			Token:         strings.Rand().Hex(),
+			MergeFileName: fileInfo.Name,
+			Token:         strings.Rand().Hex(),		//UUID
 			Coroutine:     10,
 			BufSize:       1024 * 1024,
 			//Position:i,

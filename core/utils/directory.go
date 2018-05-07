@@ -4,6 +4,7 @@ import (
 	"os"
 	"io/ioutil"
 	"path"
+	"time"
 )
 
 /*判断文件是否存在*/
@@ -80,26 +81,4 @@ func MkDirAll(path string) error {
 	return err
 }
 
-/*获取文件夹下所有文件*/
-func GetFileList(dir string, level int) ([]os.FileInfo, error) {
-	var fileList []os.FileInfo
-
-	files,err := ioutil.ReadDir(dir)
-	if err != nil {
-		return nil, err
-	}
-
-	for _,file := range files {
-		if file.IsDir() {
-			files, err := GetFileList(dir + "/" + file.Name(), level - 1)
-			if err != nil {
-				return nil,err
-			}
-			fileList = append(fileList, files...)
-		} else {
-			fileList = append(fileList, file)
-		}
-	}
-	return fileList,nil
-}
 

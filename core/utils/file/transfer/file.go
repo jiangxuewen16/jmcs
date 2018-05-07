@@ -2,6 +2,7 @@ package transfer
 
 import (
 	"jmcs/core/utils/strings"
+	"net"
 )
 
 /* socket 文件发送包*/
@@ -26,6 +27,11 @@ type ReceivePackage struct {
 	Position  int    //文件数据包在文件所在的位置
 	Message   string //失败信息
 	isSuccess bool //是否发送成功
+}
+
+func (c SendPackage) Handle(conn net.Conn) {
+	clientTransfer := ClientTransfer{c, conn}
+	clientTransfer.SendFile()
 }
 
 /*const (
