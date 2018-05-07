@@ -5,6 +5,7 @@ import (
 	"jmcs/core/utils/file/transfer"
 	"github.com/gin-gonic/gin/json"
 	"jmcs/core/utils/file"
+	"net"
 )
 
 type FileTransController struct {
@@ -28,7 +29,7 @@ func (f FileTransController) Receive() {
 func (f FileTransController) Send() {
 	filePath := "C:/temp/new"
 	rootPath := "C:/temp/root"
-	conn := f.Conn
+	//conn := f.Conn
 
 	fileInfos, err := file.GetFileList(filePath, 0)
 
@@ -36,21 +37,13 @@ func (f FileTransController) Send() {
 
 	}
 
-	for _, fileInfo := range fileInfos {
-		sp := transfer.SendPackage{
-			Size:          fileInfo.Size,
-			FileName:      fileInfo.Name,
-			Path:          fileInfo.Path,
-			RootPath:      rootPath,
-			MergeFileName: fileInfo.Name,
-			//Token:         strings.Rand().Hex(), //UUID
-			//Coroutine:     10,		//这个可以通过 size/bufsize 计算的出来
-			BufSize:       1024 * 1024,
-			//Position:i,
-			//Data:          []byte("1234567890\r\n"),
-		}
+	conn, _ := net.Dial("tcp", "127.0.0.1:8002")
 
-		sp.Handle(conn)
+	head := f.BuildHead("/file/receive", 200)
+
+	for _, fileInfo := range fileInfos {
+		sp := transfer.SendPackage{}
+		sp.Handle(conn, rootPath, head.Bytes(), fileInfo)
 	}
 
 	f.Close() //文件传输完成,断开连接

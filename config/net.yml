@@ -1,11 +1,11 @@
 http:
     enable: true
-    port: 8080
+    port: 8081
 wbSocket:
     enable: true
     port: 8002
     defaultRouter:
 socket:
     enable: true
-    port: 8001
+    port: 8002
     heartEnable: true

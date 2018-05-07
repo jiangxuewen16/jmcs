@@ -4,6 +4,8 @@ import (
 	"jmcs/core/utils/strings"
 	"net"
 	"math"
+	"jmcs/core/utils/file"
+	"os"
 )
 
 /* socket 文件发送包*/
@@ -27,32 +29,50 @@ type ReceivePackage struct {
 	Token     string //文件标记（用于标记每个文件，最后合并按此标记来）-> 用uuid
 	Position  int    //文件数据包在文件所在的位置
 	Message   string //失败信息
-	isSuccess bool //是否发送成功
+	isSuccess bool   //是否发送成功
 }
 
-func (c SendPackage) Handle(conn net.Conn) {
-	clientTransfer := ClientTransfer{c, conn}
-	c.calculate()		//计算些发送数据
-	c.SetToken()	    //file token
+func (c SendPackage) Handle(conn net.Conn, rootPath string, head []byte, fileInfo file.FileInfo) {
+	c.Size = fileInfo.Size
+	c.FileName = fileInfo.Name
+	c.Path = fileInfo.Path
+	c.RootPath = rootPath
+	c.MergeFileName = fileInfo.Name
+	c.BufSize = 1024 * 1024
+	clientTransfer := c.buildClientTransfer(conn, head)
 	clientTransfer.SendFile()
 }
 
-func (c SendPackage) calculate(){
+func (c SendPackage) buildClientTransfer(conn net.Conn, head []byte) ClientTransfer {
+	c.calculate() //计算些发送数据
+	c.SetToken()  //file token
+	fl, err := c.openfile()
+	if err != nil {
+		panic(err)
+	}
+	return ClientTransfer{c, conn,fl, head}
+
+}
+
+func (c SendPackage) openfile() (fl *os.File, err error) {
+	filePath := c.Path + "/" + c.FileName
+	fl, err = os.OpenFile(filePath, os.O_RDWR, 0666) //读写打开
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (c *SendPackage) calculate() {
 	if c.BufSize > 0 {
-		f := float64(c.Size)/float64(c.BufSize)
+		f := float64(c.Size) / float64(c.BufSize)
 		c.Coroutine = int(math.Ceil(f))
 	}
 }
 
-/*const (
-	FILE         = 1 << iota
-	FOLDER
-	//FILE_PACKAGE
-)*/
-
-func (f SendPackage) SetToken() {
+func (s *SendPackage) SetToken() {
 	uuid := strings.Rand()
-	f.Token = uuid.Hex()
+	s.Token = uuid.Hex()
 }
 
 //todo:接收数据的时候统计文件接收了多少个包

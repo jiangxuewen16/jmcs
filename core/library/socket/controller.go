@@ -66,7 +66,7 @@ func (s SocketController) ResolveBody(proto interface{}) {
 	}
 }
 
-func (s SocketController) buildHead(router string, status int) bytes.Buffer {
+func (s SocketController) BuildHead(router string, status int) bytes.Buffer {
 	var buf bytes.Buffer
 	buf.WriteString("HEAD / SOCKET/1.0")
 	buf.WriteString("\r\n\r\n")
@@ -94,7 +94,7 @@ func (s SocketController) Responser(data interface{}, router string, message str
 	if err != nil {
 		status = http.StatusInternalServerError //服务端错误
 	}
-	buf := s.buildHead(router, status)
+	buf := s.BuildHead(router, status)
 	buf.Write(body)
 	s.Write(buf.Bytes())
 }

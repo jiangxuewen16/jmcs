@@ -49,5 +49,5 @@ func Run() {
 	initConf()
 
 	/*启动http应用*/
-	R.Router.Run()
+	R.Router.Run(":" + config.Port.String())
 }
