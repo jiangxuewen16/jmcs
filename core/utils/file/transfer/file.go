@@ -39,7 +39,7 @@ func (c SendPackage) Handle(conn net.Conn, rootPath string, head []byte, fileInf
 	c.Path = fileInfo.Path
 	c.RootPath = rootPath
 	c.MergeFileName = fileInfo.Name
-	c.BufSize = 1024 * 1024
+	c.BufSize = 64
 	clientTransfer := c.buildClientTransfer(conn, head)
 	clientTransfer.SendFile()
 }

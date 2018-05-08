@@ -40,6 +40,7 @@ func (c ClientTransfer) SendFile() {
 		if err != nil {
 			panic(err)
 		}
+		fmt.Println(buf)
 		go c.send(ch,buf)
 		//go c.receive()
 	}

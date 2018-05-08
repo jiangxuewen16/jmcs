@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"strings"
 	"strconv"
+	"bytes"
 )
 
 //sph  -> socket protocol head
@@ -19,6 +20,8 @@ type Head struct {
 	// userAgent []string `json:"User-agent"`
 	// accept []common.ContentType `json:"accept"`
 }
+
+var bf bytes.Buffer
 
 /*解析socket约定的数据到结构体*/
 func (h *Head) parse(b []byte) {
