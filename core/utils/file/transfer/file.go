@@ -6,6 +6,7 @@ import (
 	"math"
 	"jmcs/core/utils/file"
 	"os"
+	"path/filepath"
 )
 
 /* socket 文件发送包*/
@@ -50,19 +51,19 @@ func (c SendPackage) buildClientTransfer(conn net.Conn, head []byte) ClientTrans
 	if err != nil {
 		panic(err)
 	}
-	return ClientTransfer{c, conn,fl, head}
+	return ClientTransfer{c, conn, fl, head}
 
 }
 
 func (c SendPackage) openfile() (fl *os.File, err error) {
-	filePath := c.Path + "/" + c.FileName
-	fl, err = os.OpenFile(filePath, os.O_RDWR, 0666) //读写打开
+	fl, err = os.OpenFile(filepath.Join(c.Path, c.FileName), os.O_RDWR, 0666) //读写打开
 	if err != nil {
 		return
 	}
 	return
 }
 
+/*计算需要发送多少个包*/
 func (c *SendPackage) calculate() {
 	if c.BufSize > 0 {
 		f := float64(c.Size) / float64(c.BufSize)
