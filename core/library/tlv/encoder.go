@@ -39,22 +39,23 @@ type TLVPkg struct {
 	FrameType byte   //帧类型，0-基本类型，1-私有类型
 	DataType  byte   //数据类型，0-基本数据，1-TLV数据
 	TagValue  int    //tag类型值
-	Value     []byte //实际数据
+	Value     []byte //实际数据		//todo：真正的业务数据
 
-	data []byte //数据包字节数据
+	data []byte //数据包字节数据 //todo：最终要发送的数据
 }
 
 // 构建tlv对象数据
 func (this *TLVPkg) Build() {
+	/*统计业务数据的长度字节*/
 	this.dataByteCount = len(this.Value)
 
-	tagBytes := buildTag(this.FrameType, this.DataType, this.TagValue)
+	/*长度字段*/
 	lenBytes := buildLength(this.dataByteCount)
-
-	//fmt.Printf("dataByteCount = %v, lenBytes = %v\n", this.dataByteCount, lenBytes)
-
-	this.tagByteCount = len(tagBytes)
 	this.lenByteCount = len(lenBytes)
+
+	/*统计类型字段字节数*/
+	tagBytes := buildTag(this.FrameType, this.DataType, this.TagValue)
+	this.tagByteCount = len(tagBytes)		//类型字段字节数
 
 	this.data = append(this.data, tagBytes...)
 	this.data = append(this.data, lenBytes...)
