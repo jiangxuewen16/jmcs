@@ -13,9 +13,9 @@ type Config map[string]interface{}
 
 var Configs = make(map[string]Config) //todo:是否把总配置放这里，应不应该放到业务中去
 
-var AppConfig Config
+var AppConfig Config		//app的配置
 
-var Suffix = []string{".yml"}		//todo:现在只支持yaml配置格式
+var Suffix = []string{".yml"}		//只支持yaml配置格式
 
 func (c Config) Resolve(filePath string) {
 	f, err := os.Open(filePath)
