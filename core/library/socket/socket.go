@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"errors"
 	"bytes"
+	"sync"
 )
 
 type socket struct {
@@ -23,12 +24,14 @@ const (
 	CONF_NAME = "net.socket" //配置名称，靠这个解析出该应用具体配置
 )
 
-func Run() {
+func Run(waitGroup sync.WaitGroup) {
 	/*初始化socket应用配置*/
 	initconf()
 
 	/*启动socket服务端*/
 	start()
+
+	waitGroup.Done()
 }
 
 func initconf() {

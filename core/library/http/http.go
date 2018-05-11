@@ -9,6 +9,7 @@ import (
 	"fmt"
 	R "jmcs/app/routers/http"			//初始化该包
 
+	"sync"
 )
 
 type http struct {
@@ -44,10 +45,12 @@ func initConf() {
 	}
 }
 
-func Run() {
+func Run(waitGroup sync.WaitGroup) {
 	/*初始化http应用配置*/
 	initConf()
 
 	/*启动http应用*/
 	R.Router.Run(":" + config.Port.String())
+
+	waitGroup.Done()
 }

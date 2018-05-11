@@ -7,11 +7,11 @@ import (
 	_ "jmcs/app/routers/socket" //初始化socket路由 todo:这里初始化路由
 	"os"
 	"fmt"
+	"sync"
 )
 
 const (
-
-	CONFIG_PATH = "C:/golang/src/jmcs/config"			//todo:这里一定要用户输入
+	CONFIG_PATH = "D:/golang/src/jmcs/config"			//todo:这里一定要用户输入
 	CONF_NAME = "app" //配置名称
 )
 
@@ -38,8 +38,29 @@ func init() {
 		os.Exit(0)
 	}
 
-
 	/*创建项目临时文件夹*/
+	createTempDir(appConfig)
+}
+
+func Run() {
+	var waitGroup sync.WaitGroup			//用于同步goroutine
+
+	/*启动socket*/
+	waitGroup.Add(1)
+	go socket.Run(waitGroup)
+
+	/*启动web服务*/
+	waitGroup.Add(1)
+	go http.Run(waitGroup)
+
+	//todo:websoket
+
+	//todo: Hook::listen 切点，tp那种
+
+	waitGroup.Wait()		//阻塞住主线程，可同时监听多个端口
+}
+
+func createTempDir(appConfig map[string]interface{})  {
 	var tempDirName string
 	if appName, ok := appConfig["name"]; ok {
 		tempDirName = appName.(string)
@@ -53,19 +74,4 @@ func init() {
 	}
 	appConfig["temDir"] = appTempDir
 	utils.AppConfig = appConfig
-
-}
-
-func Run() {
-
-	/*启动socket*/
-	go socket.Run() //todo:这里异步执行防止给短路，可以接着执行http应用
-
-	/*启动web服务*/
-	http.Run()
-
-	//todo:websoket
-
-	//todo: Hook::listen 切点，tp那种
-
 }
